@@ -184,6 +184,7 @@ const STATUS_CFG = {
 
 const CellTooltip = ({cell}) => React.createElement('div', {style:{fontSize:12}},
   React.createElement('div', null, `库位: ${cell.binNo}`),
+  React.createElement('div', null, `目标库位: ${cell.targetBinNo||'待分配'}`),
   React.createElement('div', null, `分区: ${cell.areaName}`),
   cell.profileType && React.createElement('div', null, `规格: ${cell.profileType}`),
   cell.material && React.createElement('div', null, `材质: ${cell.material}`),
@@ -348,6 +349,8 @@ const InventoryDashboard = ({gridData, inventoryData}) => {
   };
 
   const invCols = [
+    {title:'库位号', dataIndex:'binNo', width:110},
+    {title:'目标库位', dataIndex:'targetBinNo', width:110, render:v=>v||'待分配'},
     {title:'型材唯一编码', dataIndex:'profileId', width:155, ellipsis:true},
     {title:'船号', dataIndex:'shipNo', width:100},
     {title:'分段号', dataIndex:'blockNo', width:100},
@@ -356,7 +359,6 @@ const InventoryDashboard = ({gridData, inventoryData}) => {
     {title:'材质', dataIndex:'material', width:80},
     {title:'长度(mm)', dataIndex:'length', width:100},
     {title:'炉批号', dataIndex:'heatNumber', width:120},
-    {title:'库位号', dataIndex:'binNo', width:110},
     {title:'操作', key:'op', width:80, fixed:'right',
       render:(_,r)=>React.createElement(Button,{
         size:'small',type:'link',
@@ -462,7 +464,7 @@ const InventoryDashboard = ({gridData, inventoryData}) => {
         dataSource:tableData,
         rowSelection:{type:'checkbox'},
         size:'small',
-        scroll:{x:1100},
+        scroll:{x:1210},
         pagination:{pageSize:8,showSizeChanger:true,showTotal:t=>`共 ${t} 条`},
       })
     ),
@@ -507,11 +509,13 @@ const InventoryDashboard = ({gridData, inventoryData}) => {
   );
 };
 
-const InboundPage = ({data}) => {
+const InboundPage = ({data, planData, onNavigate}) => {
   const [open, setOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailRow, setDetailRow] = useState(null);
   const [tasks, setTasks] = useState(data);
+  const [taskEditRow, setTaskEditRow] = useState(null);
+  const [taskEditFields, setTaskEditFields] = useState({});
   const {message:msg} = App.useApp();
 
   const canRevoke = (st) => ['WAIT','CHECK_FAILED'].includes(st);
@@ -520,6 +524,9 @@ const InboundPage = ({data}) => {
   const [manualNote, setManualNote] = useState('');
   const [editFields, setEditFields] = useState({});
   const anomaly = tasks.find(t => t.status === 'CHECK_FAILED');
+  const zoneAnomaly = tasks.find(t => t.status === 'ZONE_MATCH_FAILED');
+  const [zoneFixRow, setZoneFixRow] = useState(null);
+  const [manualZone, setManualZone] = useState();
   const openConfirm = (row) => {
     setEditFields({ profileUid:row.profileUid, shipNo:row.shipNo, blockNo:row.blockNo,
       programNo:row.programNo, profileType:row.profileType, material:row.material,
@@ -527,7 +534,6 @@ const InboundPage = ({data}) => {
     setManualNote(row.manualNote || '');
     setConfirmRow(row);
   };
-  useEffect(() => { const bad = tasks.find(t => t.status === 'CHECK_FAILED'); if (bad) openConfirm(bad); }, []);
   const setF = (k, v) => setEditFields(prev => ({ ...prev, [k]: v }));
   const fld = (label, node) => React.createElement(Col, { span:12, style:{marginBottom:10} },
     React.createElement('div', { style:{fontSize:12,color:'#6b7280',marginBottom:4} }, label), node);
@@ -539,8 +545,37 @@ const InboundPage = ({data}) => {
   };
 
   const [adv, setAdv] = useState(null);
-  const doDispatch = (r) => { setTasks(prev=>prev.map(t=>t.key===r.key?{...t,status:'WAIT'}:t));
+  const doDispatch = (r) => {
+    if (r.zoneMatchStatus==='FAILED' || !r.zone) { msg.error('目标库区匹配异常，请先指定库区或重新排产'); return; }
+    const blocker = tasks.find(t=>t.status==='ZONE_MATCH_FAILED' && (t.order??0)<(r.order??0));
+    if (blocker) { msg.error(`前序任务 ${blocker.taskNo} 库区匹配异常，当前任务暂不可下发`); return; }
+    setTasks(prev=>prev.map(t=>t.key===r.key?{...t,status:'WAIT'}:t));
     msg.success(`任务 ${r.taskNo} 已下发，状态 → 待入库`); };
+  const openZoneFix = (r) => { setZoneFixRow(r); setManualZone(r.zone || undefined); };
+  const retryZoneMatch = (row) => {
+    const norm = v => String(v ?? '').trim().toUpperCase();
+    const program = v => norm(v).match(/(?:HC)?(PX|PY|PZ|PJ)/)?.[1] || norm(v);
+    const matchedIndex = (planData || []).findIndex(p => p.planningStatus==='PLANNED'
+      && norm(p.shipNo)===norm(row.shipNo)
+      && norm(p.blockNo)===norm(row.blockNo)
+      && program(p.programNo)===program(row.programNo));
+    if (matchedIndex < 0) {
+      msg.error(`任务 ${row.taskNo} 重新匹配失败，仍未找到对应排产结果`);
+      return;
+    }
+    const matchedPlan = planData[matchedIndex];
+    const zone = INB_ZONES[(matchedIndex + Number(matchedPlan.key || 0)) % INB_ZONES.length];
+    setTasks(prev=>prev.map(t=>t.key===row.key?{...t,status:'NOT_STARTED',zone,
+      zoneMatchStatus:'MATCHED',zoneMatchSource:'排产重试匹配',matchedPlanKey:matchedPlan.key}:t));
+    msg.success(`任务 ${row.taskNo} 重新匹配成功，目标库区：${zone}`);
+  };
+  const saveManualZone = () => {
+    if (!manualZone) { msg.warning('请选择目标库区'); return; }
+    setTasks(prev=>prev.map(t=>t.key===zoneFixRow.key?{...t,status:'NOT_STARTED',zone:manualZone,
+      zoneMatchStatus:'MANUAL',zoneMatchSource:'人工指定'}:t));
+    msg.success(`任务 ${zoneFixRow.taskNo} 已指定目标库区：${manualZone}`);
+    setZoneFixRow(null); setManualZone(undefined);
+  };
   const doAdv = () => {
     if (!adv) return;
     if (adv.type==='revoke') {
@@ -560,6 +595,20 @@ const InboundPage = ({data}) => {
     setAdv(null);
   };
   const detailBtn = (r) => React.createElement(Button,{size:'small',type:'link',onClick:()=>{setDetailRow(r);setDetailOpen(true);}},'详情');
+  const openTaskEdit = (r) => { setTaskEditRow(r); setTaskEditFields({...r}); };
+  const setTaskField = (key, value) => setTaskEditFields(prev=>({...prev,[key]:value}));
+  const saveTaskEdit = () => {
+    if (!String(taskEditFields.taskNo||'').trim() || !String(taskEditFields.profileUid||'').trim()) {
+      msg.warning('任务号和型材唯一编码不能为空'); return;
+    }
+    const next = {...taskEditFields,
+      taskNo:String(taskEditFields.taskNo).trim(), profileUid:String(taskEditFields.profileUid).trim()};
+    setTasks(prev=>prev.map(t=>t.key===taskEditRow.key?next:t));
+    if (detailRow?.key===taskEditRow.key) setDetailRow(next);
+    msg.success(`任务 ${next.taskNo} 已更新`);
+    setTaskEditRow(null); setTaskEditFields({});
+  };
+  const editBtn = (r) => React.createElement(Button,{size:'small',type:'link',onClick:()=>openTaskEdit(r)},'编辑');
 
   const baseCols = [
     {title:'型材唯一编码', dataIndex:'profileUid', width:150, fixed:'left', ellipsis:true,
@@ -575,30 +624,39 @@ const InboundPage = ({data}) => {
     {title:'炉批号', dataIndex:'heatNo', width:90},
     {title:'入库模式', dataIndex:'mode', width:100,
       render:v=>React.createElement(Tag,{color:v==='SCAN'?'blue':'orange'},INB_MODES[v]||v)},
-    {title:'状态', dataIndex:'status', width:110,
-      render:v=>React.createElement(Tag,{color:INB_STATUSES[v]?.color},INB_STATUSES[v]?.label||v)},
-    {title:'创建时间', dataIndex:'createTime', width:155, ellipsis:true},
+    {title:'状态', dataIndex:'status', width:120,
+      render:(v,r)=>r.autoBlocked && zoneAnomaly
+        ? React.createElement(Tag,{color:'warning'},'前序异常阻塞')
+        : React.createElement(Tag,{color:INB_STATUSES[v]?.color},INB_STATUSES[v]?.label||v)},
   ];
-  const pendingCols = [...baseCols,
-    {title:'库区', key:'zone', width:120, render:(_,r)=>React.createElement(Select,{
-      size:'small', value:r.zone, style:{width:100},
-      options: INB_ZONES.map(z=>({value:z,label:z})),
-      onChange:(v)=>setTasks(prev=>prev.map(t=>t.key===r.key?{...t,zone:v}:t)),
-    })},
+  const createTimeCol = {title:'创建时间', dataIndex:'createTime', width:155, ellipsis:true};
+  const pendingCols = [...baseCols, createTimeCol,
+    {title:'目标库区', key:'zone', width:150, render:(_,r)=>r.zoneMatchStatus==='FAILED'
+      ? React.createElement(Space,{size:2},
+          React.createElement(Tag,{color:'error',style:{margin:0}},'匹配失败'),
+          React.createElement(Button,{size:'small',type:'link',onClick:()=>openZoneFix(r)},'指定'),
+          React.createElement(Button,{size:'small',type:'link',onClick:()=>retryZoneMatch(r)},'重试'))
+      : React.createElement(Space,{size:4},
+          React.createElement(Tag,{color:r.zoneMatchStatus==='MANUAL'?'gold':'blue',style:{margin:0}},r.zone),
+          React.createElement(Text,{type:'secondary',style:{fontSize:11}},r.zoneMatchSource))},
     {title:'操作', key:'op', width:260, fixed:'right', render:(_,r)=>React.createElement(Space,{size:4},
       detailBtn(r),
-      React.createElement(Button,{size:'small',type:'link',onClick:()=>msg.info('编辑功能暂未实现')},'编辑'),
+      editBtn(r),
       React.createElement(Button,{size:'small',type:'link',danger:true,onClick:()=>msg.info('删除功能暂未实现')},'删除'),
-      React.createElement(Button,{size:'small',type:'primary',onClick:()=>doDispatch(r)},'模拟到位'))}];
-  const dispatchedCols = [...baseCols,
+      React.createElement(Button,{size:'small',type:'primary',onClick:()=>doDispatch(r)},'下发'))}];
+  const dispatchedCols = [...baseCols, createTimeCol,
+    {title:'目标库区', dataIndex:'zone', width:110},
+    {title:'目标库位', dataIndex:'binCode', width:100, render:v=>v||'待分配'},
     {title:'操作', key:'op', width:140, fixed:'right', render:(_,r)=>React.createElement(Space,{size:2},
       detailBtn(r),
       React.createElement(Button,{size:'small',type:'link',danger:true,onClick:()=>setAdv({type:'revoke',row:r})},'撤回'))}];
   const historyCols = [...baseCols,
-    {title:'完成时间', dataIndex:'finishTime', width:155, ellipsis:true},
-    {title:'库位', dataIndex:'binCode', width:90},
+    {title:'目标库区', dataIndex:'zone', width:110},
+    {title:'目标库位', dataIndex:'binCode', width:100},
+    {title:'开始时间', dataIndex:'startTime', width:155, ellipsis:true},
+    {title:'结束时间', dataIndex:'endTime', width:155, ellipsis:true},
     {title:'操作', key:'op', width:80, fixed:'right', render:(_,r)=>detailBtn(r)}];
-  const pendingList = tasks.filter(t=>t.status==='NOT_STARTED');
+  const pendingList = tasks.filter(t=>t.status==='NOT_STARTED'||t.status==='ZONE_MATCH_FAILED');
   const dispList = tasks.filter(t=>t.status==='WAIT'||t.status==='CHECK_FAILED'||t.status==='IN_PROGRESS').slice().sort((a,b)=>(a.order??0)-(b.order??0));
   const histList = tasks.filter(t=>t.status==='FINISHED');
 
@@ -608,6 +666,15 @@ const InboundPage = ({data}) => {
   })).filter(s=>s.cnt>0);
 
   return React.createElement('div', {className:'page-content'},
+    zoneAnomaly && React.createElement(Alert, {
+      type:'error', showIcon:true, className:'section-gap',
+      message:'库区匹配异常 · 任务暂不可下发',
+      description:`任务 ${zoneAnomaly.taskNo} 未找到对应排产结果，无法自动确定目标库区。`,
+      action: React.createElement(Space,null,
+        React.createElement(Button,{size:'small',danger:true,onClick:()=>openZoneFix(zoneAnomaly)},'指定'),
+        React.createElement(Button,{size:'small',onClick:()=>retryZoneMatch(zoneAnomaly)},'重试'),
+        React.createElement(Button,{size:'small',onClick:()=>onNavigate?.('sched-list')},'前往排产')),
+    }),
     anomaly && React.createElement(Alert, {
       type:'error', showIcon:true, className:'section-gap',
       message:'校验异常 · 产线已停线',
@@ -645,7 +712,7 @@ const InboundPage = ({data}) => {
                 scroll:{x:1470}, pagination:{pageSize:10,showTotal:t=>`共 ${t} 条`}, locale:{emptyText:'暂无已下发任务'} })) },
           { key:'history', label:`历史任务 (${histList.length})`,
             children: React.createElement(Table,{ columns:historyCols, dataSource:histList, rowKey:'key', size:'small',
-              scroll:{x:1470}, pagination:{pageSize:10,showTotal:t=>`共 ${t} 条`}, locale:{emptyText:'暂无历史任务'} }) },
+              scroll:{x:1570}, pagination:{pageSize:10,showTotal:t=>`共 ${t} 条`}, locale:{emptyText:'暂无历史任务'} }) },
         ],
       })
     ),
@@ -715,6 +782,37 @@ const InboundPage = ({data}) => {
       )
     ),
 
+    React.createElement(Modal,{
+      title:`编辑入库任务 — ${taskEditRow?.taskNo||''}`, open:!!taskEditRow, width:760,
+      okText:'保存', cancelText:'取消', onOk:saveTaskEdit,
+      onCancel:()=>{setTaskEditRow(null);setTaskEditFields({});}, destroyOnClose:true,
+    }, taskEditRow && React.createElement(Form,{layout:'vertical'},
+      React.createElement(Row,{gutter:16},
+        ...[
+          ['任务号','taskNo'],['型材唯一编码','profileUid'],['船号','shipNo'],['分段号','blockNo'],
+          ['程序号','programNo'],['型材规格','profileType'],['材质','material'],['炉批号','heatNo'],
+          ['目标库位','binCode'],['库区匹配方式','zoneMatchSource'],['创建时间','createTime'],
+          ['开始时间','startTime'],['结束时间','endTime'],
+        ].map(([label,key])=>React.createElement(Col,{span:key==='profileUid'||key==='taskNo'?12:8,key},
+          React.createElement(Form.Item,{label,required:key==='taskNo'||key==='profileUid'},
+            React.createElement(Input,{value:taskEditFields[key]||'',onChange:e=>setTaskField(key,e.target.value)})))),
+        React.createElement(Col,{span:8},React.createElement(Form.Item,{label:'长度（mm）'},
+          React.createElement(InputNumber,{min:0,style:{width:'100%'},value:taskEditFields.length,onChange:v=>setTaskField('length',v)}))),
+        React.createElement(Col,{span:8},React.createElement(Form.Item,{label:'入库模式'},
+          React.createElement(Select,{style:{width:'100%'},value:taskEditFields.mode,onChange:v=>setTaskField('mode',v),
+            options:Object.entries(INB_MODES).map(([value,label])=>({value,label}))}))),
+        React.createElement(Col,{span:8},React.createElement(Form.Item,{label:'当前状态'},
+          React.createElement(Select,{style:{width:'100%'},value:taskEditFields.status,onChange:v=>setTaskField('status',v),
+            options:Object.entries(INB_STATUSES).map(([value,cfg])=>({value,label:cfg.label}))}))),
+        React.createElement(Col,{span:8},React.createElement(Form.Item,{label:'目标库区'},
+          React.createElement(Select,{allowClear:true,style:{width:'100%'},value:taskEditFields.zone||undefined,
+            onChange:v=>setTaskField('zone',v||''),options:INB_ZONES.map(z=>({value:z,label:z}))}))),
+        React.createElement(Col,{span:8},React.createElement(Form.Item,{label:'库区匹配状态'},
+          React.createElement(Select,{style:{width:'100%'},value:taskEditFields.zoneMatchStatus,onChange:v=>setTaskField('zoneMatchStatus',v),
+            options:[{value:'MATCHED',label:'排产匹配'},{value:'MANUAL',label:'人工指定'},{value:'FAILED',label:'匹配失败'}]}))),
+      )
+    )),
+
     // Detail drawer
     React.createElement(Modal,{
       title:`任务详情 — ${detailRow?.taskNo}`,
@@ -737,14 +835,37 @@ const InboundPage = ({data}) => {
               React.createElement(Tag,{color:detailRow.mode==='SCAN'?'blue':'orange'},INB_MODES[detailRow.mode]||detailRow.mode)
             ),
             React.createElement(Descriptions.Item,{label:'当前状态'},
-              React.createElement(Tag,{color:INB_STATUSES[detailRow.status]?.color},INB_STATUSES[detailRow.status]?.label)
+              detailRow.autoBlocked && zoneAnomaly
+                ? React.createElement(Tag,{color:'warning'},'前序异常阻塞')
+                : React.createElement(Tag,{color:INB_STATUSES[detailRow.status]?.color},INB_STATUSES[detailRow.status]?.label)
             ),
+            React.createElement(Descriptions.Item,{label:'目标库区'},detailRow.zone||'—'),
+            React.createElement(Descriptions.Item,{label:'目标库位'},detailRow.binCode||'待分配'),
+            React.createElement(Descriptions.Item,{label:'库区匹配方式'},detailRow.zoneMatchSource||'—'),
             React.createElement(Descriptions.Item,{label:'创建时间'},detailRow.createTime),
-            React.createElement(Descriptions.Item,{label:'完成时间'},detailRow.finishTime||'—'),
-            React.createElement(Descriptions.Item,{label:'报工时间',span:2},detailRow.reportTime||'—'),
+            React.createElement(Descriptions.Item,{label:'开始时间'},detailRow.startTime||'—'),
+            React.createElement(Descriptions.Item,{label:'结束时间'},detailRow.endTime||'—'),
           )
         },
-        { key:'verify', label:'校验结果',
+        ...(detailRow.status==='FINISHED' ? [{ key:'mat', label:'母材报工 (2)',
+          children: React.createElement(Table, {
+            columns:[
+              {title:'工序',dataIndex:'phaseNo',width:90,render:v=>React.createElement(Tag,{color:'cyan'},v)},
+              {title:'车间',dataIndex:'workshopNo',width:80},
+              {title:'工位',dataIndex:'workplaceNo',width:80},
+              {title:'报工状态',dataIndex:'opStatus',width:100,render:v=>React.createElement(Tag,{color:v==='START'?'processing':'success'},v==='START'?'开工':'完工')},
+              {title:'操作人',dataIndex:'operator',width:90},
+              {title:'关联库位',dataIndex:'binCode',width:100},
+              {title:'操作时间',dataIndex:'opTime',width:160},
+            ],
+            dataSource:[
+              {key:'start',phaseNo:'入库',workshopNo:'仓储车间',workplaceNo:'入库口',opStatus:'START',operator:'操作员1',binCode:detailRow.binCode,opTime:detailRow.startTime},
+              {key:'finish',phaseNo:'入库',workshopNo:'仓储车间',workplaceNo:'入库口',opStatus:'FINISH',operator:'操作员1',binCode:detailRow.binCode,opTime:detailRow.endTime},
+            ],
+            rowKey:'key', size:'small', scroll:{x:700}, pagination:false,
+          })
+        }] : []),
+        ...(detailRow.status!=='WAIT' ? [{ key:'verify', label:'校验结果',
           children: React.createElement('div',{style:{textAlign:'center'}},
             React.createElement('img',{src:inbVerifyImg(detailRow), alt:'校验结果',
               style:{maxWidth:'100%',borderRadius:8,border:'1px solid #f0f0f0'}}),
@@ -754,7 +875,7 @@ const InboundPage = ({data}) => {
             detailRow.manualNote && React.createElement(Alert,{type:'warning',showIcon:true,
               style:{marginTop:10,textAlign:'left'}, message:'人工处理记录', description:detailRow.manualNote})
           )
-        },
+        }] : []),
       ]})
     ),
 
@@ -786,6 +907,21 @@ const InboundPage = ({data}) => {
           onChange:(e)=>setManualNote(e.target.value), placeholder:'可填写人工复核结果或处理说明…'})
       )
     ),
+
+    React.createElement(Modal,{
+      title:'处理库区匹配异常', open:!!zoneFixRow, width:520,
+      okText:'确认指定', cancelText:'取消', onOk:saveManualZone,
+      onCancel:()=>{setZoneFixRow(null);setManualZone(undefined);},
+    }, zoneFixRow && React.createElement('div',null,
+      React.createElement(Alert,{type:'error',showIcon:true,style:{marginBottom:16},
+        message:'未找到对应排产结果',
+        description:`任务 ${zoneFixRow.taskNo}（${zoneFixRow.shipNo} / ${zoneFixRow.blockNo} / ${zoneFixRow.programNo}）无法自动匹配目标库区。`}),
+      React.createElement(Form,{layout:'vertical'},
+        React.createElement(Form.Item,{label:'目标库区',required:true},
+          React.createElement(Select,{value:manualZone,onChange:setManualZone,placeholder:'请选择目标库区',
+            options:INB_ZONES.map(z=>({value:z,label:z}))}))),
+      React.createElement(Button,{type:'link',style:{padding:0},onClick:()=>{setZoneFixRow(null);onNavigate?.('sched-list');}},'前往排产列表重新排产并下发')
+    )),
 
     React.createElement(Modal,{
       title:'⚠️ 高级权限操作确认', open:!!adv, okText:'确认执行', cancelText:'取消',
@@ -1346,8 +1482,9 @@ const OutboundPage = () => {
     (!pkgFilter || i.packageNo === pkgFilter) &&
     (!sourceFilter || i.source === sourceFilter));
   const kbPend = filtered.filter(i => i.status === '未叫料');
+  const kbCalled = filtered.filter(i => i.status === '已叫料');
+  const kbProcessing = filtered.filter(i => i.status !== '未叫料' && i.status !== '已叫料' && i.status !== '分拣完成');
   const kbHist = filtered.filter(i => i.status === '分拣完成');
-  const kbDisp = filtered.filter(i => i.status !== '未叫料' && i.status !== '分拣完成');
 
   const batchNextContent = React.createElement('div', { style:{ maxWidth:248 } },
     React.createElement('div', { style:{fontSize:11,color:'#9ca3af',marginBottom:6} }, '统一设置所选物料的工位'),
@@ -1584,8 +1721,10 @@ const OutboundPage = () => {
             React.createElement(Text, { type:'secondary', style:{ display:'block', fontSize:12, marginBottom:6 } }, '提示：按住每行左侧手柄 ⠿ 拖动，可调整下发顺序（影响自动下发的先后）'),
             kbTable(kbPend, true, undefined, true)) 
             },
-        { key:'dispatched', label:`已下发 (${kbDisp.length})`,
-          children: kbTable(kbDisp, true) },
+        { key:'called', label:`已叫料 (${kbCalled.length})`,
+          children: kbTable(kbCalled, true) },
+        { key:'processing', label:`加工中 (${kbProcessing.length})`,
+          children: kbTable(kbProcessing, true) },
         { key:'history', label:`历史任务 (${kbHist.length})`,
           children: kbTable(kbHist, false, histCols) },
       ]})
@@ -2909,7 +3048,7 @@ const AppInner = () => {
   useEffect(() => {
     window.PLAN_PROD_DATE_MAP = buildPlanProdDateMap(applyPlanProdDateStore(planData));
   }, [planData]);
-  const inboundData    = useMemo(()=>makeInbound(18), []);
+  const inboundData    = useMemo(()=>makeInbound(18, planData), [planData]);
   const production     = useMemo(()=>makeProductionData(20), []);
   const outboundData   = production.outbound;
   const matReportData  = production.matReports;
@@ -2984,7 +3123,7 @@ const AppInner = () => {
   const renderPage = () => {
     switch(page) {
       case 'dashboard':   return React.createElement(InventoryDashboard,  {gridData, inventoryData});
-      case 'inbound':     return React.createElement(InboundPage,         {data:inboundData});
+      case 'inbound':     return React.createElement(InboundPage,         {data:inboundData,planData,onNavigate:setPage});
       case 'outbound':    return React.createElement(OutboundPage,        {data:outboundData, matReports:matReportData, partsReports:partsReportData});
       case 'bin-maint':   return React.createElement(BinMaintenancePage,  {data:binMaintData});
       case 'plan':        return React.createElement(PlanPage,            {data:planData});

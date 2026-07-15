@@ -50,11 +50,13 @@ const initGrid = () => {
           const col = colIdx + 1;
           const st = pick(STATUS_WEIGHTS);
           const has = st === 'occupied' || st === 'locked' || st === 'abnormal';
+          const binNo = `${area.shortName}-${padZ(level)}-${padZ(col)}`;
           return {
             id:`${area.key}-${level}-${col}`,
             areaKey: area.key,
             areaName: area.name,
-            binNo:`${area.shortName}-${padZ(level)}-${padZ(col)}`,
+            binNo,
+            targetBinNo: has ? binNo : null,
             status: st,
             profileId:  has ? `P${randId()}` : null,
             shipNo:     has ? pick(SHIP_LIST) : null,
@@ -88,6 +90,7 @@ const makeInventory = (warehouseAreas) => flattenWarehouseAreas(warehouseAreas)
     areaKey:cell.areaKey,
     areaName:cell.areaName,
     binNo:cell.binNo,
+    targetBinNo:cell.targetBinNo,
     binStatus:cell.status,
     quantity:rnd(4)+1,
     updateDate:randDate(),
@@ -165,6 +168,7 @@ const makePlans = (pkgCount=10) => {
 
 const INB_STATUSES = {
   NOT_STARTED: {label:'未开始',   color:'default'},
+  ZONE_MATCH_FAILED:{label:'库区匹配异常', color:'error'},
   WAIT:        {label:'待入库',   color:'warning'},
   CHECK_FAILED:{label:'校验异常', color:'error'},
   IN_PROGRESS: {label:'入库中',   color:'processing'},
@@ -176,31 +180,45 @@ const INB_PROGS = ['PX','PY','PZ','PJ'];
 const INB_MATERIALS = ['AH32','DH36','EH36','Q235B','Q345B'];
 const INB_LENGTHS = [6000,9000,11000,12000,13500];
 const INB_ZONES = ['1号分区','2号分区','3号分区'];
-const makeInbound = (n=18) => {
+const makeInbound = (n=18, plans=[]) => {
+  const schedRows = Array.isArray(plans) ? plans.filter(p => p.planningStatus === 'PLANNED') : [];
+  const failAt = Math.min(4, Math.max(0, n - 1));
+  const historyFrom = Math.min(11, n);
+  const shortProgramNo = value => {
+    const match = String(value || '').toUpperCase().match(/(?:HC)?(PX|PY|PZ|PJ)/);
+    return match ? match[1] : String(value || '');
+  };
   const rows = Array.from({length:n},(_,i)=>{
-    const r = Math.random();
-    const status = r<0.30 ? 'NOT_STARTED' : (r<0.52 ? 'WAIT' : (r<0.66 ? 'IN_PROGRESS' : 'FINISHED'));
+    const status = i < failAt ? 'WAIT' : (i < historyFrom ? 'NOT_STARTED' : 'FINISHED');
+    const matchedPlan = schedRows.length && i !== failAt ? schedRows[i % schedRows.length] : null;
+    const matchedZone = matchedPlan ? INB_ZONES[(i + matchedPlan.key) % INB_ZONES.length] : '';
     return {
       key:i+1,
       taskNo:`INB-2026-${padZ(i+1,4)}`,
       profileUid:`PM${randId()}`,
-      shipNo:'H'+(2700+rnd(80)),
-      blockNo:String(5000+rnd(900)),
-      programNo:pick(INB_PROGS),
-      profileType:pick(INB_SPECS),
-      material:pick(INB_MATERIALS),
-      length:pick(INB_LENGTHS),
+      shipNo:matchedPlan?.shipNo || 'H'+(2700+rnd(80)),
+      blockNo:matchedPlan?.blockNo || String(5000+rnd(900)),
+      programNo:matchedPlan ? shortProgramNo(matchedPlan.programNo) : pick(INB_PROGS),
+      profileType:matchedPlan?.profileType || pick(INB_SPECS),
+      material:matchedPlan?.material || pick(INB_MATERIALS),
+      length:matchedPlan?.length || pick(INB_LENGTHS),
       heatNo:String(1000+rnd(9000)),
       mode:pick(Object.keys(INB_MODES)),
-      status, manualNote:null, order:i,
-      zone: pick(INB_ZONES),
-      binCode: status==='FINISHED' ? ('A-'+padZ(rnd(20)+1)) : '',
+      status: matchedPlan ? status : 'ZONE_MATCH_FAILED', manualNote:null, order:i,
+      zone: matchedZone,
+      zoneMatchStatus: matchedPlan ? 'MATCHED' : 'FAILED',
+      zoneMatchSource: matchedPlan ? '排产匹配' : '',
+      matchedPlanKey: matchedPlan?.key || null,
+      autoBlocked: i > failAt && i < historyFrom,
+      binCode: !matchedPlan || status==='NOT_STARTED' ? '' : ('A-'+padZ(rnd(20)+1)),
       createTime:randTime(),
+      startTime: status==='FINISHED' ? randTime() : '',
+      endTime: status==='FINISHED' ? randTime() : '',
       finishTime: status==='FINISHED' ? randTime() : '',
       reportTime: status==='FINISHED' ? randTime() : '',
     };
   });
-  const waiting = rows.filter(x=>x.status==='WAIT');
+  const waiting = rows.filter(x=>x.status==='WAIT' && x.zoneMatchStatus==='MATCHED');
   if (waiting.length) waiting[rnd(waiting.length)].status = 'CHECK_FAILED';
   return rows;
 };
