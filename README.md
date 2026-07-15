@@ -6,5 +6,4 @@
 
 使用浏览器打开 `中控系统.html` 即可查看系统原型。
 
-# 在线查看最新版
-https://lshqwertyuiop.github.io/central-control-system/
+在线查看最新版: https://lshqwertyuiop.github.io/central-control-system/
