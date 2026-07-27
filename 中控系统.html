@@ -1178,7 +1178,7 @@ const makeKanbanItems = () => {
         outlet: kbRand(KB_STATIONS.E),       // 出库口（先前定下，可修改）
         sprayStation: kbRand(KB_STATIONS.P), // 喷码工位（先前定下，可修改）
         cutStation: kbRand(KB_STATIONS.C),   // 切割工位（先前定下，可修改）
-        realtimeStock: num % 5 === 0 ? 0 : (num % 3) + 1,
+        realtimeStock: 1,
         uiState: 'pending',       // pending | loading | success | conflict | error
         editingField: null,       // 'outlet' | 'cut'
         pendingVal: null,
@@ -1305,7 +1305,7 @@ const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder,
           return React.createElement(Tooltip,{key:task.id,title:tip(task,cutMinutes(task))},
             React.createElement('div',{
               className:'kbq-cut-item kbq-outlet-card'+(running?' is-running':'')+(pending?' is-pending':'')+(selected?' is-selected':'')+(dragOverId===task.id?' is-dragover':''),
-              draggable:false,
+              draggable:pending,
               onDragStart:()=>{if(pending)queueDragId.current=task.id;},
               onDragOver:e=>{if(pending){e.preventDefault();setDragOverId(task.id);}},
               onDragEnd:()=>{queueDragId.current=null;setDragOverId(null);},
@@ -1314,6 +1314,7 @@ const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder,
             },
               React.createElement('div',{className:'kbq-cut-top'},
                 React.createElement('span',{className:'kbq-cut-id'},task.nestingLayoutNo),
+                pending&&React.createElement('span',{className:'kbq-drag',title:'拖动调整出库顺序'},'⠿')
               ),
               React.createElement('div',{className:'kbq-card-status'},
                 running?React.createElement(Tag,{color:'processing',style:{margin:0}},'出库中'):
@@ -1346,7 +1347,7 @@ const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder,
         return React.createElement(Tooltip,{key:task.id,title:tip(task,sprayMinutes(task),'喷码')},
           React.createElement('div',{
             className:'kbq-cut-item kbq-outlet-card'+(active?' is-running':'')+(waiting?' is-pending':'')+(selected?' is-selected':'')+(dragOverId===task.id?' is-dragover':''),
-            draggable:false,
+            draggable:waiting,
             onDragStart:()=>{if(waiting)sprayDragId.current=task.id;},
             onDragOver:e=>{if(waiting){e.preventDefault();setDragOverId(task.id);}},
             onDragEnd:()=>{sprayDragId.current=null;setDragOverId(null);},
@@ -1355,6 +1356,7 @@ const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder,
           },
             React.createElement('div',{className:'kbq-cut-top'},
               React.createElement('span',{className:'kbq-cut-id'},task.nestingLayoutNo),
+              waiting&&React.createElement('span',{className:'kbq-drag',title:'拖动调整喷码顺序'},'⠿')
             ),
             React.createElement('div',{className:'kbq-card-status'},
               React.createElement(Tag,{color:KB_STATUS_COLOR[task.status]||'default',style:{margin:0}},task.status),
@@ -1383,7 +1385,7 @@ const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder,
         return React.createElement(Tooltip,{key:task.id,title:tip(task,cutMinutes(task))},
           React.createElement('div',{
             className:'kbq-cut-item kbq-outlet-card'+(running?' is-running':'')+(waiting?' is-pending':'')+(selected?' is-selected':'')+(dragOverId===task.id?' is-dragover':''),
-            draggable:false,
+            draggable:waiting,
             onDragStart:()=>{if(waiting)cutDragId.current=task.id;},
             onDragOver:e=>{if(waiting){e.preventDefault();setDragOverId(task.id);}},
             onDragEnd:()=>{cutDragId.current=null;setDragOverId(null);},
@@ -1392,6 +1394,7 @@ const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder,
           },
             React.createElement('div',{className:'kbq-cut-top'},
               React.createElement('span',{className:'kbq-cut-id'},task.nestingLayoutNo),
+              waiting&&React.createElement('span',{className:'kbq-drag',title:'拖动调整切割顺序'},'⠿')
             ),
             React.createElement('div',{className:'kbq-card-status'},
               React.createElement(Tag,{color:KB_STATUS_COLOR[task.status]||(task.status==='已叫料'?'purple':'default'),style:{margin:0}},task.status),
@@ -1586,7 +1589,7 @@ const OutboundPage = () => {
         matReports:reports.matReports, partReports:reports.partReports, parts,
         status:'未叫料', pushLib:enab(v.pushLibEnable), pushSpray:enab(v.pushSprayEnable), pushCut:enab(v.pushCutEnable),
         outlet:v.outlet, sprayStation:v.sprayStation, cutStation:v.cutStation,
-        realtimeStock: idx % 4 === 0 ? 0 : 1,
+        realtimeStock: 1,
         uiState:'pending', editingField:null, pendingVal:null, conflictActual:null,
       };
     });
