@@ -132,6 +132,8 @@
     .kb-drag-handle:hover { color:#fa8c16; }
     .kb-drag-handle:active { cursor: grabbing; }
     .kb-table .kb-row-dragover > td { border-top: 2px solid #fa8c16 !important; background:#fff7e6; }
+    /* 加工任务列表固定高度：任务较少时也保持一致的可视区域 */
+    .kb-table .ant-table-body { height: 520px !important; max-height: 520px !important; }
     .sched-gantt { border:1px solid #f0f0f0; border-radius:6px; background:#fafbfc; padding:6px 4px; }
     .kb-prog { display:flex; flex-direction:column; gap:3px; }
     .kb-prog-bar { display:flex; gap:3px; }
@@ -140,6 +142,67 @@
     .kb-prog-cur  { background:#1677ff; box-shadow:0 0 0 2px rgba(22,119,255,.18); animation:cellPulse 1.6s infinite; }
     .kb-prog-pend { background:#e5e7eb; }
     .kb-prog-label { font-size:11px; color:#6b7280; white-space:nowrap; }
+    .kbq-wrap { margin-top:14px; border-color:#f0f0f0; }
+    .kbq-wrap > .ant-card-head { min-height:44px; padding:0 14px; }
+    .kbq-wrap > .ant-card-head .ant-card-head-title { font-size:14px; font-weight:600; }
+    .kbq-wrap > .ant-card-body { padding:0 14px 14px; }
+    .kbq-wrap .ant-tabs-nav { margin-bottom:12px; }
+    .kbq-wrap .ant-tabs-tab { padding:11px 0; font-size:13px; }
+    .kbq-section-title { font-size:14px; font-weight:700; color:#1f2937; margin-bottom:9px; }
+    .kbq-outlets { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .kbq-panel { border-color:#f0f0f0!important; background:#fff; min-width:0; overflow:hidden; }
+    .kbq-panel > .ant-card-head { min-height:40px; padding:0 12px; background:#fafafa; }
+    .kbq-panel > .ant-card-head .ant-card-head-title { padding:9px 0; font-size:13px; font-weight:600; }
+    .kbq-panel > .ant-card-head .ant-card-extra { padding:7px 0; }
+    .kbq-panel > .ant-card-body { padding:0; }
+    .kbq-panel-head { min-height:42px; padding:8px 11px; display:flex; align-items:center; justify-content:space-between; gap:10px; border-bottom:1px solid #eef0f2; }
+    .kbq-panel-title { font-size:13px; font-weight:700; }
+    .kbq-outlet-body { padding:9px; min-height:74px; display:flex; flex-direction:column; gap:7px; background:#fafafa; }
+    .kbq-outlet-item { width:100%; display:flex; align-items:center; gap:5px; padding:5px 7px; border:1px solid #d9e2ec; background:#f8fafc; cursor:grab; }
+    .kbq-outlet-item.is-called { cursor:default; background:#faf7ff; border-color:#d3adf7; }
+    .kbq-outlet-item.is-running { cursor:default; background:#f0f7ff; border-color:#91caff; border-left:3px solid #1677ff; }
+    .kbq-outlet-item.is-selected { border-color:#e85b00; background:#fff7e6; box-shadow:0 0 0 2px rgba(232,91,0,.12); }
+    .kbq-outlet-item.is-dragover { border-top:2px solid #e85b00; }
+    .kbq-outlet-task { flex:1; min-width:0; padding:0 3px!important; height:24px!important; border:0!important; background:transparent!important; box-shadow:none!important; font:600 11px Consolas,monospace!important; text-align:left!important; justify-content:flex-start!important; }
+    .kbq-drag { color:#9ca3af; font-size:14px; line-height:1; }
+    .kbq-gantt { border:1px solid #e5e7eb; background:#fff; overflow-x:auto; }
+    .kbq-scale, .kbq-lane { display:grid; grid-template-columns:190px minmax(760px,1fr); min-width:950px; }
+    .kbq-scale { border-bottom:1px solid #e5e7eb; background:#fafafa; }
+    .kbq-scale-label { padding:8px 11px; font-size:12px; color:#6b7280; border-right:1px solid #e5e7eb; }
+    .kbq-scale-track { display:grid; grid-template-columns:repeat(5,1fr); font-size:11px; color:#8c8c8c; align-items:center; }
+    .kbq-scale-track span { padding-left:6px; border-left:1px solid #e5e7eb; }
+    .kbq-lane + .kbq-lane { border-top:1px solid #e5e7eb; }
+    .kbq-lane-meta { padding:9px 11px; border-right:1px solid #e5e7eb; background:#fff; }
+    .kbq-lane-name { display:flex; align-items:center; justify-content:space-between; gap:6px; font-size:13px; font-weight:700; }
+    .kbq-lane-time { margin-top:5px; font-size:11px; line-height:1.55; color:#6b7280; }
+    .kbq-track { display:flex; align-items:center; min-height:76px; padding:10px 8px; gap:3px; background:repeating-linear-gradient(to right,#fff 0,#fff calc(20% - 1px),#eef0f2 calc(20% - 1px),#eef0f2 20%); }
+    .kbq-busy { height:34px; min-width:22px; background:#d1d5db; color:#4b5563; display:flex; align-items:center; justify-content:center; font-size:10px; overflow:hidden; }
+    .kbq-block { height:34px; min-width:42px; border:1px solid #91caff; background:#e6f4ff; color:#0958d9; display:flex; align-items:center; justify-content:center; padding:0 5px; font:600 10px Consolas,monospace; cursor:pointer; overflow:hidden; white-space:nowrap; transition:.15s; }
+    .kbq-block:hover { background:#bae0ff; border-color:#1677ff; transform:translateY(-1px); }
+    .kbq-block.is-selected { background:#fff1e6; border-color:#e85b00; color:#ad3f00; box-shadow:0 0 0 2px rgba(232,91,0,.18); }
+    .kbq-block.is-disabled { background:#f5f5f5; border-color:#d9d9d9; color:#8c8c8c; }
+    .kbq-cut-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+    .kbq-spray-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .kbq-cut-list { padding:9px; min-height:180px; display:flex; flex-direction:column; gap:7px; background:#fafafa; }
+    .kbq-cut-item { border:1px solid #e5e7eb; border-radius:4px; background:#fff; padding:9px 10px; cursor:pointer; transition:border-color .15s,box-shadow .15s,background .15s; }
+    .kbq-cut-item.is-pending { cursor:grab; }
+    .kbq-cut-item.is-dragover { border-top:2px solid #e85b00; }
+    .kbq-cut-item:hover { border-color:#91caff; box-shadow:0 2px 6px rgba(0,0,0,.05); }
+    .kbq-cut-item.is-running { border-left:3px solid #1677ff; background:#f5f9ff; }
+    .kbq-cut-item.is-selected { border-color:#e85b00; background:#fff7e6; box-shadow:0 0 0 2px rgba(232,91,0,.12); }
+    .kbq-cut-top { display:flex; align-items:center; justify-content:space-between; gap:6px; }
+    .kbq-cut-id { font:600 12px Consolas,monospace; color:#1f2937; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .kbq-card-status { margin-top:5px; min-height:22px; display:flex; align-items:center; gap:4px; }
+    .kbq-outlet-card { cursor:pointer; }
+    .kbq-outlet-card.is-pending { cursor:grab; }
+    .kbq-cut-meta { margin-top:5px; font-size:12px; color:#6b7280; line-height:1.45; }
+    .kbq-cut-progress { margin-top:6px; display:flex; align-items:center; gap:7px; }
+    .kbq-cut-progress .ant-progress { flex:1; margin:0; }
+    .kbq-cut-progress-label { width:92px; font-size:11px; color:#4b5563; text-align:right; white-space:nowrap; }
+    .kbq-empty { padding:35px 10px; text-align:center; color:#bfbfbf; font-size:12px; }
+    @media(max-width:760px){ .kbq-outlets{grid-template-columns:1fr;} }
+    @media(max-width:980px){ .kbq-cut-grid{grid-template-columns:1fr;} }
+    @media(max-width:760px){ .kbq-spray-grid{grid-template-columns:1fr;} }
 
     /* Light sider override */
     .ant-layout-sider { border-right: 1px solid #f0f0f0 !important; }
@@ -971,7 +1034,7 @@ const KB_LANES = [
   { id:4, label:'分拣',  icon:'🗂️', color:'green',  statuses:['切割完成','分拣中','分拣完成'],             curPool:null, nextPool:null },
 ];
 const KB_STATUS_COLOR = {
-  '未叫料':'default','已叫料':'purple',
+  '未叫料':'default','待出库':'orange','已叫料':'purple',
   '出库中':'processing','出库完成':'success','喷码中':'gold',
   '喷码完成':'success','去底漆中':'gold','去底漆完成':'success','切割中':'gold',
   '切割完成':'success','分拣中':'gold','分拣完成':'success',
@@ -984,14 +1047,14 @@ const KB_LENGTHS = [6000,9000,11000,12000,13500];
 const KB_PALLETS = ['L1','L2','S1','S2'];   // 分拣托盘
 const KB_DAOS = ['H1','H2','H3','M1','M2','G1','R1','C1'];
 const KB_STAGE = {  // 看板状态 → PROCESS_FLOW 阶段索引
-  '未叫料':0,'已叫料':1,'出库中':2,'出库完成':2,'喷码中':3,'喷码完成':3,
+  '未叫料':0,'待出库':1,'已叫料':2,'出库中':3,'出库完成':3,'喷码中':4,'喷码完成':4,
   '去底漆中':4,'去底漆完成':4,'切割中':5,'切割完成':5,'分拣中':6,'分拣完成':6,
 };
 // 加工进度（5 步）：出库 → 喷码 → 去底漆 → 切割 → 分拣
 const KB_PROG_STEPS = ['出库','喷码','去底漆','切割','分拣'];
 // [已完成步数, 进行中步索引(-1=无)]：区分 未开始 / 进行中 / 步间等待 / 全部完成
 const KB_PROG_STAGE = {
-  '未叫料':   [0,-1], '已叫料':   [0,-1],
+  '未叫料':   [0,-1], '待出库':   [0,-1], '已叫料':   [0,-1],
   '出库中':   [0, 0], '出库完成': [1,-1],
   '喷码中':   [1, 1], '喷码完成': [2,-1],
   '去底漆中': [2, 2], '去底漆完成':[3,-1],
@@ -1115,6 +1178,7 @@ const makeKanbanItems = () => {
         outlet: kbRand(KB_STATIONS.E),       // 出库口（先前定下，可修改）
         sprayStation: kbRand(KB_STATIONS.P), // 喷码工位（先前定下，可修改）
         cutStation: kbRand(KB_STATIONS.C),   // 切割工位（先前定下，可修改）
+        realtimeStock: 1,
         uiState: 'pending',       // pending | loading | success | conflict | error
         editingField: null,       // 'outlet' | 'cut'
         pendingVal: null,
@@ -1125,18 +1189,251 @@ const makeKanbanItems = () => {
   return items;
 };
 
+const KB_QUEUE_GANTT_ENABLED = new URLSearchParams(window.location.search).get('queueView') === 'gantt';
+const redistributePendingTasks = (items, field, station, alternatives) => alternatives.length ? (()=>{let cursor=0;return items.map(item=>item.status==='未叫料'&&item[field]===station?{...item,[field]:alternatives[cursor++%alternatives.length]}:item);})() : items;
+const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder, onDisableAndReschedule }) => {
+  const [outletEnabled, setOutletEnabled] = useState({ E1:true, E2:true });
+  const [sprayEnabled, setSprayEnabled] = useState({ P1:true, P2:true });
+  const [cutEnabled, setCutEnabled] = useState({ C1:true, C2:true, C3:true });
+  const [queueOrder, setQueueOrder] = useState(()=>tasks.map(t=>t.id));
+  const [sprayOrder, setSprayOrder] = useState(()=>tasks.map(t=>t.id));
+  const [cutOrder, setCutOrder] = useState(()=>tasks.map(t=>t.id));
+  const [dragOverId, setDragOverId] = useState(null);
+  const queueDragId = useRef(null);
+  const sprayDragId = useRef(null);
+  const cutDragId = useRef(null);
+  useEffect(()=>setQueueOrder(prev=>[
+    ...prev.filter(id=>tasks.some(t=>t.id===id)),
+    ...tasks.map(t=>t.id).filter(id=>!prev.includes(id)),
+  ]),[tasks]);
+  useEffect(()=>setSprayOrder(prev=>[...prev.filter(id=>tasks.some(t=>t.id===id)),...tasks.map(t=>t.id).filter(id=>!prev.includes(id))]),[tasks]);
+  useEffect(()=>setCutOrder(prev=>[...prev.filter(id=>tasks.some(t=>t.id===id)),...tasks.map(t=>t.id).filter(id=>!prev.includes(id))]),[tasks]);
+  const now = useMemo(() => dayjs().second(0), []);
+  const busyMinutes = { C1:18, C2:34, C3:12 };
+  const cutMinutes = (task) => Math.max(12, Math.round((Number(task.length)||9000)/520 + 4 + (String(task.id).charCodeAt(String(task.id).length-1)%7)));
+  const sprayMinutes = (task) => Math.max(6, Math.round((Number(task.length)||9000)/1100 + 3));
+  const outlets = ['E1','E2'];
+  const sprays = ['P1','P2'];
+  const cuts = ['C1','C2','C3'];
+  const pendingTasks = tasks.filter(t=>t.status==='未叫料');
+  const calledTasks = tasks.filter(t=>t.status==='已叫料');
+  const processingTasks = tasks.filter(t=>t.status!=='未叫料' && t.status!=='已叫料' && t.status!=='分拣完成');
+  const outletQueueTasks = tasks.filter(t=>t.status==='出库中' || t.status==='已叫料' || t.status==='待出库' || t.status==='未叫料');
+  const outletRank = (task) => task.status==='待出库'?0:(task.status==='出库中'?1:(task.status==='已叫料'?2:3));
+  const orderedTasks = queueOrder.map(id=>tasks.find(t=>t.id===id)).filter(t=>t&&(t.status==='出库中'||t.status==='已叫料'||t.status==='待出库'||t.status==='未叫料')).sort((a,b)=>outletRank(a)-outletRank(b));
+  const statusRank = (task) => task.status==='未叫料' || task.status==='已叫料' ? 900 : -kbSeqOf(task.status);
+  const orderIndex = (order,id) => { const i=order.indexOf(id); return i<0?9999:i; };
+  const laneTasks = Object.fromEntries(cuts.map(c => [c, tasks.filter(t=>t.cutStation===c).sort((a,b)=>statusRank(a)-statusRank(b)||orderIndex(cutOrder,a.id)-orderIndex(cutOrder,b.id))]));
+  const laneTotals = Object.fromEntries(cuts.map(c => [c, laneTasks[c].reduce((sum,t)=>sum+cutMinutes(t),0)]));
+  const sprayQueueTasks = tasks.filter(t=>kbSeqOf(t.status)<=kbSeqOf('喷码中'));
+  const sprayRank = (task) => task.status==='未叫料'||task.status==='已叫料'?2:(task.status==='喷码中'?0:1);
+  const sprayLanes = Object.fromEntries(sprays.map(p=>[p,sprayQueueTasks.filter(t=>t.sprayStation===p).sort((a,b)=>sprayRank(a)-sprayRank(b)||orderIndex(sprayOrder,a.id)-orderIndex(sprayOrder,b.id))]));
+  const progressInfo = (task) => {
+    if (task.status==='未叫料') return {percent:0,label:'待下发'};
+    if (task.status==='已叫料') return {percent:0,label:'已叫料'};
+    const pair=KB_PROG_STAGE[task.status]||[0,-1];
+    return {percent:Math.min(100,Math.round((pair[0]+(pair[1]>=0?.5:0))/KB_PROG_STEPS.length*100)),label:task.status};
+  };
+  const requestAvailabilityChange = (kind, station, nextEnabled, enabledMap, setEnabled) => {
+    if (nextEnabled) { setEnabled(prev=>({...prev,[station]:true})); return; }
+    const kindLabel=kind==='outlet'?'出库口':(kind==='spray'?'喷码工位':'切割机');
+    const alternatives=Object.keys(enabledMap).filter(key=>key!==station&&enabledMap[key]);
+    Modal.confirm({
+      title:`禁用 ${station} ${kindLabel}`,
+      content:`是否重新排产，将 ${station} 中的待下发任务发送给其他可用${kindLabel}？已叫料和加工中任务不会变更。`,
+      okText:'禁用并重新排产', cancelText:'取消',
+      onOk:()=>{ setEnabled(prev=>({...prev,[station]:false})); onDisableAndReschedule?.(kind,station,alternatives); },
+      footer:(_, {OkBtn,CancelBtn})=>React.createElement(Space,null,
+        React.createElement(CancelBtn),
+        React.createElement(Button,{onClick:()=>{
+          setEnabled(prev=>({...prev,[station]:false}));
+          Modal.destroyAll();
+        }},'仅禁用'),
+        React.createElement(OkBtn)
+      ),
+    });
+  };
+  const selectAndReveal = (task) => {
+    onSelectTask(task);
+    setTimeout(() => {
+      const row = document.querySelector(`[data-row-key="${task.id}"]`);
+      if (row) row.scrollIntoView({behavior:'smooth',block:'center'});
+    }, 50);
+  };
+  const reorderOutlet = (targetId, outlet) => {
+    const dragId=queueDragId.current;
+    const dragged=tasks.find(t=>t.id===dragId), target=tasks.find(t=>t.id===targetId);
+    if (!dragged || !target || dragged.outlet!==outlet || target.outlet!==outlet || dragged.status!=='未叫料' || target.status!=='未叫料') return;
+    setQueueOrder(prev=>{
+      const next=prev.filter(id=>id!==dragId);
+      const at=next.indexOf(targetId);
+      next.splice(at<0?next.length:at,0,dragId);
+      return next;
+    });
+    onReorder?.(dragId,targetId);
+  };
+  const reorderWaiting = (dragId,targetId,field,station,setOrder) => {
+    const dragged=tasks.find(t=>t.id===dragId), target=tasks.find(t=>t.id===targetId);
+    const waiting=t=>t&&(t.status==='未叫料'||t.status==='已叫料');
+    if (!waiting(dragged) || !waiting(target) || dragged[field]!==station || target[field]!==station) return;
+    setOrder(prev=>{
+      const next=prev.filter(id=>id!==dragId), at=next.indexOf(targetId);
+      next.splice(at<0?next.length:at,0,dragId);
+      return next;
+    });
+    if (dragged.status==='未叫料' && target.status==='未叫料') onReorder?.(dragId,targetId);
+  };
+  const tip = (task, minutes, phase='切割') => React.createElement('div',{style:{fontSize:12,lineHeight:1.7}},
+    React.createElement('div',{style:{fontWeight:700}},task.nestingLayoutNo),
+    React.createElement('div',null,`工单号：${task.packageNo}`),
+    React.createElement('div',null,`型材规格：${task.profileType}`),
+    React.createElement('div',null,`长度：${task.length} mm`),
+    React.createElement('div',null,`出库口：${task.outlet} / 切割机：${task.cutStation}`),
+    React.createElement('div',null,`预计${phase}：${minutes} 分钟`),
+    React.createElement('div',{style:{color:'#91caff'}},'点击定位到上方任务列表')
+  );
+  const outletGrid = React.createElement('div',{className:'kbq-outlets'},outlets.map(outlet=>{
+      const list=orderedTasks.filter(t=>t.outlet===outlet);
+      return React.createElement(Card,{className:'kbq-panel',key:outlet,size:'small',
+        title:`${outlet} 出库队列`,
+        extra:React.createElement(Space,{size:8},
+          React.createElement(Tag,{color:'blue',style:{margin:0}},`${list.length} 根`),
+          React.createElement(Switch,{size:'small',checked:outletEnabled[outlet],checkedChildren:'可用',unCheckedChildren:'禁用',onChange:v=>requestAvailabilityChange('outlet',outlet,v,outletEnabled,setOutletEnabled)})
+        )},
+        React.createElement('div',{className:'kbq-outlet-body'},list.map(task=>{
+          const called=task.status==='已叫料', waitingOut=task.status==='待出库', pending=task.status==='未叫料', running=task.status==='出库中', selected=selectedRowKeys.includes(task.id);
+          return React.createElement(Tooltip,{key:task.id,title:tip(task,cutMinutes(task))},
+            React.createElement('div',{
+              className:'kbq-cut-item kbq-outlet-card'+(running?' is-running':'')+(pending?' is-pending':'')+(selected?' is-selected':'')+(dragOverId===task.id?' is-dragover':''),
+              draggable:pending,
+              onDragStart:()=>{if(pending)queueDragId.current=task.id;},
+              onDragOver:e=>{if(pending){e.preventDefault();setDragOverId(task.id);}},
+              onDragEnd:()=>{queueDragId.current=null;setDragOverId(null);},
+              onDrop:e=>{e.preventDefault();reorderOutlet(task.id,outlet);queueDragId.current=null;setDragOverId(null);},
+              onClick:()=>selectAndReveal(task),
+            },
+              React.createElement('div',{className:'kbq-cut-top'},
+                React.createElement('span',{className:'kbq-cut-id'},task.nestingLayoutNo),
+                pending&&React.createElement('span',{className:'kbq-drag',title:'拖动调整出库顺序'},'⠿')
+              ),
+              React.createElement('div',{className:'kbq-card-status'},
+                running?React.createElement(Tag,{color:'processing',style:{margin:0}},'出库中'):
+                called?React.createElement(Tag,{color:'purple',style:{margin:0}},'已叫料'):
+                waitingOut?React.createElement(Tag,{color:'orange',style:{margin:0}},'待出库'):
+                React.createElement(React.Fragment,null,
+                  React.createElement(Tag,{style:{margin:0}},'未叫料'),
+                  React.createElement(Tag,{color:task.realtimeStock>0?'success':'error',style:{margin:0}},task.realtimeStock>0?'有料':'缺料')
+                )
+              ),
+              React.createElement('div',{className:'kbq-cut-meta'},`${task.profileType} · ${task.length} mm · ${task.packageNo}`)
+              )
+          );
+        }))
+      );
+    }));
+  const sprayGrid = React.createElement('div',{className:'kbq-spray-grid'},sprays.map(spray=>{
+    const list=sprayLanes[spray], total=list.reduce((sum,t)=>sum+sprayMinutes(t),0), finishAt=now.add(total,'minute');
+    return React.createElement(Card,{key:spray,size:'small',className:'kbq-panel',
+      title:`${spray} 喷码队列`,
+      extra:React.createElement(Space,{size:7},
+        React.createElement(Tag,{color:'cyan',style:{margin:0}},`${list.length} 根`),
+        React.createElement(Switch,{size:'small',checked:sprayEnabled[spray],checkedChildren:'可用',unCheckedChildren:'禁用',onChange:v=>requestAvailabilityChange('spray',spray,v,sprayEnabled,setSprayEnabled)})
+      )},
+      React.createElement('div',{className:'kbq-lane-time',style:{padding:'7px 9px',borderBottom:'1px solid #f0f0f0'}},
+        React.createElement('span',null,`预计全部完成 ${finishAt.format('HH:mm')}`)
+      ),
+      React.createElement('div',{className:'kbq-cut-list'},list.length?list.map(task=>{
+        const active=task.status==='喷码中', waiting=task.status==='未叫料'||task.status==='已叫料', selected=selectedRowKeys.includes(task.id), prog=progressInfo(task);
+        return React.createElement(Tooltip,{key:task.id,title:tip(task,sprayMinutes(task),'喷码')},
+          React.createElement('div',{
+            className:'kbq-cut-item kbq-outlet-card'+(active?' is-running':'')+(waiting?' is-pending':'')+(selected?' is-selected':'')+(dragOverId===task.id?' is-dragover':''),
+            draggable:waiting,
+            onDragStart:()=>{if(waiting)sprayDragId.current=task.id;},
+            onDragOver:e=>{if(waiting){e.preventDefault();setDragOverId(task.id);}},
+            onDragEnd:()=>{sprayDragId.current=null;setDragOverId(null);},
+            onDrop:e=>{e.preventDefault();reorderWaiting(sprayDragId.current,task.id,'sprayStation',spray,setSprayOrder);sprayDragId.current=null;setDragOverId(null);},
+            onClick:()=>selectAndReveal(task)
+          },
+            React.createElement('div',{className:'kbq-cut-top'},
+              React.createElement('span',{className:'kbq-cut-id'},task.nestingLayoutNo),
+              waiting&&React.createElement('span',{className:'kbq-drag',title:'拖动调整喷码顺序'},'⠿')
+            ),
+            React.createElement('div',{className:'kbq-card-status'},
+              React.createElement(Tag,{color:KB_STATUS_COLOR[task.status]||'default',style:{margin:0}},task.status),
+            ),
+            React.createElement('div',{className:'kbq-cut-meta'},`${task.profileType} · ${task.length} mm · ${task.packageNo}`)
+          )
+        );
+      }):React.createElement('div',{className:'kbq-empty'},'暂无任务'))
+    );
+  }));
+  const outletContent = outletGrid;
+  const sprayContent = sprayGrid;
+  const cutContent = React.createElement('div',{className:'kbq-cut-grid'},cuts.map(cut=>{
+    const list=laneTasks[cut], availableAt=now.add(busyMinutes[cut],'minute'), finishAt=availableAt.add(laneTotals[cut],'minute');
+    return React.createElement(Card,{key:cut,size:'small',className:'kbq-panel',
+      title:`${cut} 切割队列`,
+      extra:React.createElement(Space,{size:7},
+        React.createElement(Tag,{color:'blue',style:{margin:0}},`${list.length} 根`),
+        React.createElement(Switch,{size:'small',checked:cutEnabled[cut],checkedChildren:'可用',unCheckedChildren:'禁用',onChange:v=>requestAvailabilityChange('cut',cut,v,cutEnabled,setCutEnabled)})
+      )},
+      React.createElement('div',{className:'kbq-lane-time',style:{padding:'7px 9px',borderBottom:'1px solid #f0f0f0'}},
+        React.createElement('span',null,`预计全部完成 ${finishAt.format('HH:mm')}`)
+      ),
+      React.createElement('div',{className:'kbq-cut-list'},list.length?list.map(task=>{
+        const running=processingTasks.some(t=>t.id===task.id), waiting=task.status==='未叫料'||task.status==='已叫料', selected=selectedRowKeys.includes(task.id), prog=progressInfo(task);
+        return React.createElement(Tooltip,{key:task.id,title:tip(task,cutMinutes(task))},
+          React.createElement('div',{
+            className:'kbq-cut-item kbq-outlet-card'+(running?' is-running':'')+(waiting?' is-pending':'')+(selected?' is-selected':'')+(dragOverId===task.id?' is-dragover':''),
+            draggable:waiting,
+            onDragStart:()=>{if(waiting)cutDragId.current=task.id;},
+            onDragOver:e=>{if(waiting){e.preventDefault();setDragOverId(task.id);}},
+            onDragEnd:()=>{cutDragId.current=null;setDragOverId(null);},
+            onDrop:e=>{e.preventDefault();reorderWaiting(cutDragId.current,task.id,'cutStation',cut,setCutOrder);cutDragId.current=null;setDragOverId(null);},
+            onClick:()=>selectAndReveal(task)
+          },
+            React.createElement('div',{className:'kbq-cut-top'},
+              React.createElement('span',{className:'kbq-cut-id'},task.nestingLayoutNo),
+              waiting&&React.createElement('span',{className:'kbq-drag',title:'拖动调整切割顺序'},'⠿')
+            ),
+            React.createElement('div',{className:'kbq-card-status'},
+              React.createElement(Tag,{color:KB_STATUS_COLOR[task.status]||(task.status==='已叫料'?'purple':'default'),style:{margin:0}},task.status),
+            ),
+            React.createElement('div',{className:'kbq-cut-meta'},`${task.profileType} · ${task.length} mm · ${task.packageNo}`)
+          )
+        );
+      }):React.createElement('div',{className:'kbq-empty'},'暂无任务'))
+    );
+  }));
+  return React.createElement(Card,{className:'kbq-wrap',size:'small',title:'实时排产',
+    extra:React.createElement(Space,{size:8},
+      React.createElement(Tag,{color:'blue',style:{margin:0}},`未开始 ${pendingTasks.length} 根`),
+      React.createElement(Tag,{color:'purple',style:{margin:0}},`已叫料 ${calledTasks.length} 根`),
+      React.createElement(Tag,{color:'processing',style:{margin:0}},`加工中 ${processingTasks.length} 根`),
+      selectedRowKeys.length>0 && React.createElement(Tag,{color:'orange',closable:true,style:{margin:0},onClose:()=>onSelectTask(null,true)},`已选 ${selectedRowKeys.length} 根`)
+    )},
+    React.createElement(Tabs,{defaultActiveKey:'outlet',items:[
+      {key:'outlet',label:`出库队列 (${outletQueueTasks.length})`,children:outletContent},
+      {key:'spray',label:`喷码队列 (${sprayQueueTasks.length})`,children:sprayContent},
+      {key:'cut',label:`去底漆-切割 (${tasks.length})`,children:cutContent},
+    ]})
+  );
+};
+
 const OutboundPage = () => {
   const { message: msg } = App.useApp();
   const [items, setItems] = useState(makeKanbanItems);
   const [pickerId, setPickerId] = useState(null);
   const [pkgFilter, setPkgFilter] = useState();          // 工单号筛选
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);  // 多选
+  const [productionRunning, setProductionRunning] = useState(false);
+  const [dispatchMode, setDispatchMode] = useState('manual');
+  const productionRunningRef = useRef(false);
   const [detailOpen, setDetailOpen] = useState(false);   // 详情
   const [detailRow, setDetailRow] = useState(null);
   const [batchPickerOpen, setBatchPickerOpen] = useState(false);  // 批量改即将工位
   const [activeTab, setActiveTab] = useState('pending');          // 当前 Tab
   const [sourceFilter, setSourceFilter] = useState();           // 来源筛选
-  const [dispatchMode, setDispatchMode] = useState('manual');   // manual | auto 下发模式
   const [newOrderOpen, setNewOrderOpen] = useState(false);      // 手动创建工单
   const [newOrderKeys, setNewOrderKeys] = useState([]);        // 新建工单：所选工单
   const [newOrderPkgFilter, setNewOrderPkgFilter] = useState(''); // 新建工单：工单号筛选
@@ -1151,6 +1448,7 @@ const OutboundPage = () => {
   // ── 实时状态推送（模拟）：每 4.5s 随机推进一个 pending 物料的状态 ──
   useEffect(() => {
     const timer = setInterval(() => {
+      if (!productionRunningRef.current) return;
       setItems(prev => {
         const pend = prev.filter(i => i.status !== '未叫料' && kbAllPushed(i));
         if (!pend.length) return prev;
@@ -1174,7 +1472,7 @@ const OutboundPage = () => {
   };
   // 待下发→已下发的流转：仅当仍在待下发且三推送全部成功(或无需推送)时才切换状态
   const settleDispatch = (id) => {
-    const flip = (x) => (x && x.id===id && x.status==='未叫料' && kbPushOk(x.pushLib) && kbPushOk(x.pushSpray) && kbPushOk(x.pushCut)) ? { ...x, status:'已叫料' } : x;
+    const flip = (x) => (x && x.id===id && (x.status==='未叫料'||x.status==='待出库') && kbPushOk(x.pushLib) && kbPushOk(x.pushSpray) && kbPushOk(x.pushCut)) ? { ...x, status:'已叫料' } : x;
     setItems(prev => prev.map(flip));
     setDetailRow(prev => flip(prev));
   };
@@ -1183,13 +1481,16 @@ const OutboundPage = () => {
   // 顺序推送流水线：① 喷码 + 切割（加工文件）成功 → ② 立库（叫料/出库）；①失败则阻塞，不推立库
   const runPipeline = (id, done) => {
     const finish = (ok) => { if (done) done(ok); };
+    if (!productionRunningRef.current) return finish(false);
     const phase2 = () => {
+      if (!productionRunningRef.current) return finish(false);
       const c = itemsRef.current.find(x=>x.id===id);
       if (!c) return finish(false);
       if (!(kbPushOk(c.pushSpray) && kbPushOk(c.pushCut))) return finish(false);   // 喷码/切割未成功 → 阻塞
       if (c.pushLib==='无需推送' || !needPush(c.pushLib)) { settleDispatch(id); return finish(kbPushOk(c.pushLib)); }
       patchBoth(id, { pushLib:'推送中' });
       setTimeout(() => {
+        if (!productionRunningRef.current) return finish(false);
         const pl = Math.random()<PUSH_FAIL_RATE ? '失败' : '成功';
         patchBoth(id, { pushLib:pl });
         settleDispatch(id);
@@ -1204,9 +1505,15 @@ const OutboundPage = () => {
     if (!p1.length) { phase2(); return; }
     patchBoth(id, Object.fromEntries(p1.map(k=>[k,'推送中'])));
     setTimeout(() => {
-      const res = Object.fromEntries(p1.map(k=>[k, Math.random()<PUSH_FAIL_RATE ? '失败' : '成功']));
+      if (!productionRunningRef.current) return finish(false);
+      // 喷码/切割为开始下发后的必达推送，不模拟失败
+      const res = Object.fromEntries(p1.map(k=>[k, '成功']));
       patchBoth(id, res);
-      if (p1.every(k=>res[k]==='成功')) phase2();
+      if (p1.every(k=>res[k]==='成功')) {
+        patchBoth(id, { status:'待出库' });
+        msg.info(`${id} 喷码/切割完成，等待传感器信号后叫料`);
+        setTimeout(() => { if (productionRunningRef.current) phase2(); else finish(false); }, 900);
+      }
       else {
         // 喷码/切割失败 → 阻塞，不实际推立库；但立库置“失败”以提示整单受阻
         const lib = (itemsRef.current.find(x=>x.id===id)||{}).pushLib;
@@ -1253,13 +1560,13 @@ const OutboundPage = () => {
       && i.pushLib!=='推送中' && i.pushSpray!=='推送中' && i.pushCut!=='推送中'
       && i.pushLib!=='失败'   && i.pushSpray!=='失败'   && i.pushCut!=='失败').map(i=>i.id);
     if (!ids.length) { msg.info('当前无可下发工单（或存在待重推的失败项，请先在详情重推）'); return; }
-    msg.success(`自动模式：按列表从上到下逐条下发，共 ${ids.length} 个（先喷码/切割→后立库），遇失败阻塞队列`);
+    msg.success(`开始生产：先推送喷码/切割，等待传感器信号后再推送立库，共 ${ids.length} 个`);
     const run = (list) => {
       if (!list.length) { msg.success('自动下发队列已全部完成'); return; }
       const [head, ...rest] = list;
       runPipeline(head, (ok) => {
         if (ok) run(rest);
-        else msg.error(`${head} 推送失败，自动下发队列已阻塞；请在「详情」重推成功后，再次点击「一键下发（自动）」继续`);
+        else msg.error(`${head} 推送失败，自动下发队列已阻塞；请在「详情」中重推成功后继续`);
       });
     };
     run(ids);
@@ -1283,6 +1590,7 @@ const OutboundPage = () => {
         matReports:reports.matReports, partReports:reports.partReports, parts,
         status:'未叫料', pushLib:enab(v.pushLibEnable), pushSpray:enab(v.pushSprayEnable), pushCut:enab(v.pushCutEnable),
         outlet:v.outlet, sprayStation:v.sprayStation, cutStation:v.cutStation,
+        realtimeStock: 1,
         uiState:'pending', editingField:null, pendingVal:null, conflictActual:null,
       };
     });
@@ -1409,7 +1717,6 @@ const OutboundPage = () => {
       } else if (anyFail) {
         els.push(React.createElement(Text,{key:'gate',type:'warning',style:{fontSize:12}},'推送失败·下发未完成（详情内重推）'));
       } else {
-        els.push(React.createElement(Button, { key:'dp', size:'small', type:'primary', onClick:()=>doDispatch(item) }, '下发'));
       }
       els.push(React.createElement(Button, { key:'del', size:'small', type:'link', danger:true, onClick:()=>doDelete(item) }, '删除'));
     } else {
@@ -1452,7 +1759,7 @@ const OutboundPage = () => {
     { title:'材质', dataIndex:'material', width:85 },
     { title:'长度', dataIndex:'length', width:90, render:v => `${v} mm` },
     { title:'当前状态', dataIndex:'status', width:110,
-      render:v => React.createElement(Tag, { color:KB_STATUS_COLOR[v]||'default', style:{margin:0} }, v) },
+      render:v => React.createElement(Tag, { color:KB_STATUS_COLOR[v]||'default', style:{margin:0} }, v==='未叫料'?'未开始':v) },
     { title:'加工进度', key:'prog', width:185, render:(_,item)=>renderProgress(item) },
     { title:'出库口', key:'outlet', width:120, render:(_,item)=>renderStation(item,'outlet') },
     { title:'喷码工位', key:'spray', width:120, render:(_,item)=>renderStation(item,'spray') },
@@ -1467,23 +1774,28 @@ const OutboundPage = () => {
     { title:'加工完成时间（分拣完成）', dataIndex:'finishTime', width:170, ellipsis:true },
     cols[cols.length-1],
   ];
+  const pendingCols = [
+    ...cols.slice(0, 10),
+    { title:'实时库存', dataIndex:'realtimeStock', width:110,
+      render:v => React.createElement(Tag, {
+        color:v>0?'success':'error', style:{margin:0},
+      }, v>0?'有料':'缺料') },
+    ...cols.slice(11),
+  ];
 
-  const legend = React.createElement('div', { className:'kb-legend' },
-    React.createElement('span', { className:'kb-legend-item', style:{color:'#595959'} }, '推送状态：'),
-    [['未推送','#d9d9d9'],['推送中','#1677ff'],['成功','#52c41a'],['失败','#ff4d4f'],['无需推送','#bfbfbf']].map(([t,c])=>
-      React.createElement('span', { key:t, className:'kb-legend-item' },
-        React.createElement('span', { className:'kb-legend-dot', style:{background:c} }), t)
-    )
-  );
+  const legend = null;
 
   // 工单号选项 + 按工单号过滤后的数据
   const pkgOptions = Array.from(new Set(items.map(i => i.packageNo))).sort();
   const filtered = items.filter(i =>
     (!pkgFilter || i.packageNo === pkgFilter) &&
     (!sourceFilter || i.source === sourceFilter));
+  const kbRealtimeQueueAll = items.filter(i => i.status !== '分拣完成');
   const kbPend = filtered.filter(i => i.status === '未叫料');
+  const kbWaitingOut = filtered.filter(i => i.status === '待出库' || i.status === '已叫料')
+    .sort((a,b) => (a.status==='待出库'?0:1) - (b.status==='待出库'?0:1));
   const kbCalled = filtered.filter(i => i.status === '已叫料');
-  const kbProcessing = filtered.filter(i => i.status !== '未叫料' && i.status !== '已叫料' && i.status !== '分拣完成');
+  const kbProcessing = filtered.filter(i => !['未叫料','待出库','已叫料','分拣完成'].includes(i.status));
   const kbHist = filtered.filter(i => i.status === '分拣完成');
 
   const batchNextContent = React.createElement('div', { style:{ maxWidth:248 } },
@@ -1510,30 +1822,35 @@ const OutboundPage = () => {
       onChange:setSourceFilter, style:{ width:130 },
       options:[{value:'PLAN',label:'计划'},{value:'LOCAL',label:'创建'}],
     }),
-    activeTab==='pending' && React.createElement(React.Fragment, null,
-      React.createElement('span', { key:'lbl', style:{fontSize:12,color:'#8c8c8c'} }, '下发模式'),
-      React.createElement(Radio.Group, {
-        key:'mode', size:'small', value:dispatchMode, onChange:(e)=>setDispatchMode(e.target.value),
-        optionType:'button', buttonStyle:'solid',
-        options:[{label:'手动',value:'manual'},{label:'自动',value:'auto'}],
-      }),
-      dispatchMode==='manual'
-        ? React.createElement(Button, { key:'newOrder', type:'primary', ghost:true, onClick:()=>setNewOrderOpen(true) }, '+ 新建工单')
-        : React.createElement(Button, { key:'dispAll', type:'primary', onClick:doDispatchAll }, '一键下发（自动）')
-    )
+    React.createElement(Select, {
+      value:dispatchMode, onChange:setDispatchMode, style:{ width:110 },
+      options:[{value:'manual',label:'手动模式'},{value:'auto',label:'自动模式'}],
+    }),
+    dispatchMode==='manual' && activeTab==='pending' && React.createElement(React.Fragment, null,
+      React.createElement(Button, { key:'newOrder', type:'primary', ghost:true, onClick:()=>setNewOrderOpen(true) }, '+ 新建工单')
+    ),
   );
   // 批量操作（放在 Tab 行右侧，仅有选中时显示）
-  const batchOps = selectedRowKeys.length > 0 ? React.createElement(Space, { size:8 },
-      React.createElement(Text, { type:'secondary', style:{ fontSize:12 } }, `已选 ${selectedRowKeys.length} 项`),
-      React.createElement(Popover, {
+  const startProduction = () => {
+    if (productionRunningRef.current) return msg.info('生产已在运行中');
+    productionRunningRef.current = true; setProductionRunning(true); doDispatchAll();
+  };
+  const pauseProduction = () => {
+    productionRunningRef.current = false; setProductionRunning(false); msg.warning('生产已暂停，暂停推送和立库叫料');
+  };
+  const batchOps = React.createElement(Space, { size:8 },
+      React.createElement(Button, { size:'small', type:'primary', onClick:startProduction, disabled:productionRunning }, '开始下发'),
+      React.createElement(Button, { size:'small', danger:true, onClick:pauseProduction, disabled:!productionRunning }, '暂停下发'),
+      selectedRowKeys.length > 0 && React.createElement(Text, { type:'secondary', style:{ fontSize:12 } }, `已选 ${selectedRowKeys.length} 项`),
+      selectedRowKeys.length > 0 && React.createElement(Popover, {
         content: batchNextContent, trigger:'click', placement:'bottomRight',
         open: batchPickerOpen, onOpenChange: setBatchPickerOpen,
       },
         React.createElement(Button, { size:'small', type:'primary', ghost:true }, '批量修改工位')
       ),
-      React.createElement(Button, { size:'small', onClick:doBatchRecall }, '批量撤回叫料'),
-      React.createElement(Button, { size:'small', type:'link', onClick:()=>setSelectedRowKeys([]) }, '清空')
-    ) : null;
+      selectedRowKeys.length > 0 && React.createElement(Button, { size:'small', onClick:doBatchRecall }, '批量撤回叫料'),
+      selectedRowKeys.length > 0 && React.createElement(Button, { size:'small', type:'link', onClick:()=>setSelectedRowKeys([]) }, '清空')
+    );
 
   // ── 详情：母材报工 / 零件报工 列定义（沿用原加工任务详情设计）──
   const kbPhaseColor = { 出库:'cyan', 喷码:'blue', 去底漆:'orange', 切割:'purple', 分拣:'green' };
@@ -1685,6 +2002,17 @@ const OutboundPage = () => {
       return prev.map(it => it.status==='未叫料' ? np[k++] : it);
     });
   };
+  const handleDisableAndReschedule = (kind, station, alternatives) => {
+    const field = kind==='outlet' ? 'outlet' : (kind==='spray' ? 'sprayStation' : 'cutStation');
+    const typeLabel = kind==='outlet' ? '出库口' : (kind==='spray' ? '喷码工位' : '切割机');
+    const count = items.filter(item=>item.status==='未叫料'&&item[field]===station).length;
+    if (!alternatives.length) {
+      msg.warning(`没有其他可用${typeLabel}，${count} 个待下发任务保持原工位`);
+      return;
+    }
+    setItems(prev=>redistributePendingTasks(prev,field,station,alternatives));
+    msg.success(`${station} 已禁用，${count} 个待下发任务已重新排产至 ${alternatives.join(' / ')}`);
+  };
   const dragHandleCol = {
     title:'', key:'__drag', width:40, fixed:'left', align:'center',
     render:(_, record)=> React.createElement('span', {
@@ -1698,7 +2026,8 @@ const OutboundPage = () => {
     columns: drag ? [dragHandleCol, ...(columns||cols)] : (columns||cols),
     dataSource: data, rowKey:'id', size:'small',
     rowSelection: sel ? { selectedRowKeys, onChange:setSelectedRowKeys, preserveSelectedRowKeys:true } : undefined,
-    scroll:{ x:1920 },
+    // 固定列表可视区域，避免不同页签/数据量导致页面高度跳动
+    scroll:{ x:1920, y:520 },
     rowClassName:(item)=> [
       (item.pushLib==='失败'||item.pushSpray==='失败'||item.pushCut==='失败') ? 'kb-row-pushfail' : '',
       (drag && item.id===dragOverId) ? 'kb-row-dragover' : '',
@@ -1707,7 +2036,8 @@ const OutboundPage = () => {
       onDragOver: (e) => { e.preventDefault(); if (dragOverId!==record.id) setDragOverId(record.id); },
       onDrop: (e) => { e.preventDefault(); reorderPend(dragIdRef.current, record.id); dragIdRef.current=null; setDragOverId(null); },
     }) : undefined,
-    pagination:{ pageSize:20, showTotal:t=>`共 ${t} 条`, hideOnSinglePage:true },
+    // 统一使用分页查看，分页栏始终保留以维持固定布局
+    pagination:{ pageSize:10, showSizeChanger:true, pageSizeOptions:['10','20','50'], showTotal:t=>`共 ${t} 条`, hideOnSinglePage:false },
     locale:{ emptyText:'暂无数据' },
   });
   return React.createElement('div', { className:'page-content' },
@@ -1715,27 +2045,35 @@ const OutboundPage = () => {
       size:'small', title:'加工任务列表', extra: legend,
     },
       toolbar,
-      React.createElement(Tabs, { activeKey: activeTab, onChange:(k)=>{ setActiveTab(k); setSelectedRowKeys([]); }, tabBarExtraContent: batchOps, items:[
-        { key:'pending', label:`待下发 (${kbPend.length})`,
+      React.createElement(Tabs, { activeKey: activeTab, onChange:setActiveTab, tabBarExtraContent: batchOps, items:[
+        { key:'pending', label:`未开始 (${kbPend.length})`,
           children: React.createElement('div', null,
-            React.createElement(Text, { type:'secondary', style:{ display:'block', fontSize:12, marginBottom:6 } }, '提示：按住每行左侧手柄 ⠿ 拖动，可调整下发顺序（影响自动下发的先后）'),
-            kbTable(kbPend, true, undefined, true)) 
+            kbTable(kbPend, true, pendingCols, false))
             },
-        { key:'called', label:`已叫料 (${kbCalled.length})`,
-          children: kbTable(kbCalled, true) },
+        { key:'waitingOut', label:`待出库 (${kbWaitingOut.length})`,
+          children: kbTable(kbWaitingOut, true) },
         { key:'processing', label:`加工中 (${kbProcessing.length})`,
           children: kbTable(kbProcessing, true) },
         { key:'history', label:`历史任务 (${kbHist.length})`,
           children: kbTable(kbHist, false, histCols) },
       ]})
     ),
+    KB_QUEUE_GANTT_ENABLED && React.createElement(ProcessingQueueGantt, {
+      tasks:kbRealtimeQueueAll, selectedRowKeys,
+      onReorder:reorderPend,
+      onDisableAndReschedule:handleDisableAndReschedule,
+      onSelectTask:(task,clearAll=false)=>{
+        setPkgFilter(undefined); setSourceFilter(undefined);
+        if (clearAll) { setSelectedRowKeys([]); return; }
+        setSelectedRowKeys(prev=>prev.includes(task.id)?prev.filter(id=>id!==task.id):[...prev,task.id]);
+        setActiveTab(task.status==='未叫料'?'pending':(['待出库','已叫料'].includes(task.status)?'waitingOut':'processing'));
+      },
+    }),
     detailModal,
     React.createElement(Modal, {
       title:'新建工单（从工单列表选择）', open:newOrderOpen, okText:'创建并放入待下发', cancelText:'取消',
       onOk:handleCreateOrder, onCancel:()=>{ setNewOrderOpen(false); setNewOrderKeys([]); setNewOrderPkgFilter(''); }, width:920, destroyOnClose:true,
     },
-      React.createElement(Alert,{type:'info',showIcon:true,style:{marginBottom:12},
-        message:'从工单列表勾选（可多选）需新建的工单，仅需指定出库口 / 切割工位 / 是否推送；不直接下发，放入「待下发」，来源标记「创建」。'}),
       React.createElement(Input, { allowClear:true, placeholder:'按工单号筛选（如 PKG-3010）', value:newOrderPkgFilter,
         onChange:e=>setNewOrderPkgFilter(e.target.value), style:{ width:240, marginBottom:10 } }),
       React.createElement(Table, {
@@ -3038,7 +3376,8 @@ const LogPage = () => {
 };
 
 const AppInner = () => {
-  const [page, setPage] = useState('dashboard');
+  const embeddedPage = new URLSearchParams(window.location.search).get('embed');
+  const [page, setPage] = useState(embeddedPage || 'dashboard');
   const [collapsed, setCollapsed] = useState(false);
 
   // Init data once
@@ -3124,7 +3463,12 @@ const AppInner = () => {
     switch(page) {
       case 'dashboard':   return React.createElement(InventoryDashboard,  {gridData, inventoryData});
       case 'inbound':     return React.createElement(InboundPage,         {data:inboundData,planData,onNavigate:setPage});
-      case 'outbound':    return React.createElement(OutboundPage,        {data:outboundData, matReports:matReportData, partsReports:partsReportData});
+      case 'outbound':    return embeddedPage
+        ? React.createElement(OutboundPage, {data:outboundData, matReports:matReportData, partsReports:partsReportData})
+        : React.createElement('iframe', {
+            src:'加工列表.html', title:'加工任务列表',
+            style:{width:'100%',height:'100%',border:0,display:'block',background:'#f5f6fa'}
+          });
       case 'bin-maint':   return React.createElement(BinMaintenancePage,  {data:binMaintData});
       case 'plan':        return React.createElement(PlanPage,            {data:planData});
       case 'sched-list':  return React.createElement(SchedulePage,        {});
@@ -3137,6 +3481,9 @@ const AppInner = () => {
       default: return React.createElement('div',{style:{padding:24}},'页面建设中…');
     }
   };
+
+  // 独立页面模式：只渲染指定业务页，不显示主系统侧栏和页头。
+  if (embeddedPage) return React.createElement('div', {style:{height:'100vh',overflow:'auto',background:'#f5f6fa'}}, renderPage());
 
   return React.createElement(Layout,{style:{height:'100vh'}},
     // Sider
