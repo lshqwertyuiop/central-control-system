@@ -1000,7 +1000,7 @@ const InboundPage = ({data, planData, onNavigate}) => {
 };
 
 /* ═══════════════════════ PAGE: 加工任务（实时看板 · Ant Design）═══════════════════════ */
-/* 迁移自 kanban_single_1.html：保留 实时推送 / 点击修改即将工位 / 冲突·失败·重试 / 撤回叫料 等交互，
+/* 迁移自 kanban_single_1.html：保留 实时推送 / 点击修改即将工位 / 冲突·失败·重试 / 撤回 等交互，
    全部以 Ant Design 组件（Table / Tag / Popover / Button / message）重新实现。 */
 const KB_STATIONS = { E:['E1','E2'], P:['P1','P2'], C:['C1','C2','C3'] };
 const KB_STATION_FIELDS = {
@@ -1039,6 +1039,7 @@ const KB_STATUS_COLOR = {
   '喷码完成':'success','去底漆中':'gold','去底漆完成':'success','切割中':'gold',
   '切割完成':'success','分拣中':'gold','分拣完成':'success',
 };
+const kbDisplayStatus = (status) => status === '未叫料' ? '未开始' : status;
 const kbRand = arr => arr[Math.floor(Math.random()*arr.length)];
 const KB_SPECS = ['250×90×10×15','200×90×9×14','180×75×8×12','300×100×11×16','220×95×10×14'];
 const KB_PROGS = ['PX','PY','PZ','PJ'];
@@ -1062,7 +1063,7 @@ const KB_PROG_STAGE = {
   '分拣中':   [4, 4], '分拣完成': [5,-1],
 };
 // 为单个加工任务联动生成 母材报工 / 零件报工（沿用 makeProductionData 逻辑）
-const KB_STATUS_SEQ = ['未叫料','已叫料','出库中','出库完成','喷码中','喷码完成','去底漆中','去底漆完成','切割中','切割完成','分拣中','分拣完成'];
+const KB_STATUS_SEQ = ['未叫料','待出库','已叫料','出库中','出库完成','喷码中','喷码完成','去底漆中','去底漆完成','切割中','切割完成','分拣中','分拣完成'];
 const kbSeqOf = (s) => { const i = KB_STATUS_SEQ.indexOf(s); return i<0?0:i; };
 const KB_MAT_PHASES = ['出库','喷码','去底漆','切割'];   // 母材工序
 const buildItemReports = (taskNo, profileId, profileType, shipNo, blockNo, packageNo, status) => {
@@ -1190,7 +1191,7 @@ const makeKanbanItems = () => {
 };
 
 const KB_QUEUE_GANTT_ENABLED = new URLSearchParams(window.location.search).get('queueView') === 'gantt';
-const redistributePendingTasks = (items, field, station, alternatives) => alternatives.length ? (()=>{let cursor=0;return items.map(item=>item.status==='未叫料'&&item[field]===station?{...item,[field]:alternatives[cursor++%alternatives.length]}:item);})() : items;
+const redistributePendingTasks = (items, field, station, alternatives) => alternatives.length ? (()=>{let cursor=0;return items.map(item=>(['未叫料','待出库'].includes(item.status)&&item[field]===station)?{...item,[field]:alternatives[cursor++%alternatives.length]}:item);})() : items;
 const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder, onDisableAndReschedule }) => {
   const [outletEnabled, setOutletEnabled] = useState({ E1:true, E2:true });
   const [sprayEnabled, setSprayEnabled] = useState({ P1:true, P2:true });
@@ -1219,7 +1220,7 @@ const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder,
   const calledTasks = tasks.filter(t=>t.status==='已叫料');
   const processingTasks = tasks.filter(t=>t.status!=='未叫料' && t.status!=='已叫料' && t.status!=='分拣完成');
   const outletQueueTasks = tasks.filter(t=>t.status==='出库中' || t.status==='已叫料' || t.status==='待出库' || t.status==='未叫料');
-  const outletRank = (task) => task.status==='待出库'?0:(task.status==='出库中'?1:(task.status==='已叫料'?2:3));
+  const outletRank = (task) => task.status==='出库中'?0:(task.status==='已叫料'?1:(task.status==='待出库'?2:3));
   const orderedTasks = queueOrder.map(id=>tasks.find(t=>t.id===id)).filter(t=>t&&(t.status==='出库中'||t.status==='已叫料'||t.status==='待出库'||t.status==='未叫料')).sort((a,b)=>outletRank(a)-outletRank(b));
   const statusRank = (task) => task.status==='未叫料' || task.status==='已叫料' ? 900 : -kbSeqOf(task.status);
   const orderIndex = (order,id) => { const i=order.indexOf(id); return i<0?9999:i; };
@@ -1240,7 +1241,7 @@ const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder,
     const alternatives=Object.keys(enabledMap).filter(key=>key!==station&&enabledMap[key]);
     Modal.confirm({
       title:`禁用 ${station} ${kindLabel}`,
-      content:`是否重新排产，将 ${station} 中的待下发任务发送给其他可用${kindLabel}？已叫料和加工中任务不会变更。`,
+      content:`是否重新排产，将 ${station} 中的未开始和待出库任务发送给其他可用${kindLabel}？已叫料和加工中任务不会变更。`,
       okText:'禁用并重新排产', cancelText:'取消',
       onOk:()=>{ setEnabled(prev=>({...prev,[station]:false})); onDisableAndReschedule?.(kind,station,alternatives); },
       footer:(_, {OkBtn,CancelBtn})=>React.createElement(Space,null,
@@ -1321,7 +1322,7 @@ const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder,
                 called?React.createElement(Tag,{color:'purple',style:{margin:0}},'已叫料'):
                 waitingOut?React.createElement(Tag,{color:'orange',style:{margin:0}},'待出库'):
                 React.createElement(React.Fragment,null,
-                  React.createElement(Tag,{style:{margin:0}},'未叫料'),
+                  React.createElement(Tag,{style:{margin:0}},'未开始'),
                   React.createElement(Tag,{color:task.realtimeStock>0?'success':'error',style:{margin:0}},task.realtimeStock>0?'有料':'缺料')
                 )
               ),
@@ -1359,7 +1360,7 @@ const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder,
               waiting&&React.createElement('span',{className:'kbq-drag',title:'拖动调整喷码顺序'},'⠿')
             ),
             React.createElement('div',{className:'kbq-card-status'},
-              React.createElement(Tag,{color:KB_STATUS_COLOR[task.status]||'default',style:{margin:0}},task.status),
+              React.createElement(Tag,{color:KB_STATUS_COLOR[task.status]||'default',style:{margin:0}},kbDisplayStatus(task.status)),
             ),
             React.createElement('div',{className:'kbq-cut-meta'},`${task.profileType} · ${task.length} mm · ${task.packageNo}`)
           )
@@ -1397,7 +1398,7 @@ const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder,
               waiting&&React.createElement('span',{className:'kbq-drag',title:'拖动调整切割顺序'},'⠿')
             ),
             React.createElement('div',{className:'kbq-card-status'},
-              React.createElement(Tag,{color:KB_STATUS_COLOR[task.status]||(task.status==='已叫料'?'purple':'default'),style:{margin:0}},task.status),
+              React.createElement(Tag,{color:KB_STATUS_COLOR[task.status]||(task.status==='已叫料'?'purple':'default'),style:{margin:0}},kbDisplayStatus(task.status)),
             ),
             React.createElement('div',{className:'kbq-cut-meta'},`${task.profileType} · ${task.length} mm · ${task.packageNo}`)
           )
@@ -1627,13 +1628,13 @@ const OutboundPage = () => {
       okText:'已停止，确认修改', cancelText:'取消', onOk: doApply });
   };
 
-  // 批量撤回叫料：仅对所选中状态为「已叫料」的物料生效
+  // 批量撤回：仅对所选中状态为「已叫料」的物料生效
   const doBatchRecall = () => {
     const targets = items.filter(i => selectedRowKeys.includes(i.id) && i.status === '已叫料');
     if (!targets.length) { msg.info('所选中没有「已叫料」可撤回的物料'); return; }
     const okIds = targets.filter(() => Math.random() < 0.75).map(t => t.id);
     patchMany(okIds, { status: '未叫料' });
-    if (okIds.length) msg.success(`已撤回叫料 ${okIds.length} 项`);
+    if (okIds.length) msg.success(`已撤回 ${okIds.length} 项`);
     const failN = targets.length - okIds.length;
     if (failN) msg.warning(`${failN} 项无法撤回，已开始出库`);
     setSelectedRowKeys(prev => prev.filter(k => !okIds.includes(k)));
@@ -1721,7 +1722,7 @@ const OutboundPage = () => {
       els.push(React.createElement(Button, { key:'del', size:'small', type:'link', danger:true, onClick:()=>doDelete(item) }, '删除'));
     } else {
       if (item.status === '已叫料')
-        els.push(React.createElement(Button, { key:'rc0', size:'small', type:'link', onClick:()=>doRecall(item) }, '撤回叫料'));
+        els.push(React.createElement(Button, { key:'rc0', size:'small', type:'link', onClick:()=>doRecall(item) }, '撤回'));
     }
     return React.createElement(Space, { size:0, wrap:true }, els);
   };
@@ -1848,7 +1849,7 @@ const OutboundPage = () => {
       },
         React.createElement(Button, { size:'small', type:'primary', ghost:true }, '批量修改工位')
       ),
-      selectedRowKeys.length > 0 && React.createElement(Button, { size:'small', onClick:doBatchRecall }, '批量撤回叫料'),
+      selectedRowKeys.length > 0 && React.createElement(Button, { size:'small', onClick:doBatchRecall }, '批量撤回'),
       selectedRowKeys.length > 0 && React.createElement(Button, { size:'small', type:'link', onClick:()=>setSelectedRowKeys([]) }, '清空')
     );
 
@@ -2005,7 +2006,7 @@ const OutboundPage = () => {
   const handleDisableAndReschedule = (kind, station, alternatives) => {
     const field = kind==='outlet' ? 'outlet' : (kind==='spray' ? 'sprayStation' : 'cutStation');
     const typeLabel = kind==='outlet' ? '出库口' : (kind==='spray' ? '喷码工位' : '切割机');
-    const count = items.filter(item=>item.status==='未叫料'&&item[field]===station).length;
+    const count = items.filter(item=>['未叫料','待出库'].includes(item.status)&&item[field]===station).length;
     if (!alternatives.length) {
       msg.warning(`没有其他可用${typeLabel}，${count} 个待下发任务保持原工位`);
       return;
