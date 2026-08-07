@@ -2296,8 +2296,8 @@ const SchedulePage = ({ targetDate } = {}) => {
   // 仅排产甘特图·仿真（本地计算，无需后端）；tab1 暂保留不渲染
   void tab1;
   const iframeSrc = targetDate
-    ? `排产仿真_中控.html?date=${encodeURIComponent(targetDate)}`
-    : '排产仿真_中控.html';
+    ? `排产仿真_中控.html?date=${encodeURIComponent(targetDate)}&v=20260807`
+    : '排产仿真_中控.html?v=20260807';
   return React.createElement('div', { className:'page-content', style:{ padding:'8px' } },
     React.createElement('iframe', {
       key: iframeSrc,
