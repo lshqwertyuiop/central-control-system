@@ -28,6 +28,7 @@
   function _derive(topo){
     const ao = Object.keys(topo.outlets).filter(e=>topo.outlets[e].enabled);
     const am = Object.keys(topo.machines).filter(m=>topo.machines[m].enabled);
+    if(topo.bypass_storage) return { OUTLETS:[], MACHINES:am, OUTLET_TO_MACHINES:{}, MACHINE_TO_OUTLETS:{}, bypassStorage:true };
     const ae = topo.edges.filter(([e,m])=>ao.includes(e)&&am.includes(m));
     const o2m={}, m2o={};
     for(const [e,m] of ae){ (o2m[e]=o2m[e]||[]).push(m); (m2o[m]=m2o[m]||[]).push(e); }
@@ -262,6 +263,11 @@
 
   function simulate_pipeline(machine_state, T){
     const {OUTLETS, MACHINES, MACHINE_TO_OUTLETS} = T;
+    if(T.bypassStorage){
+      const records=[];
+      for(const m of MACHINES){ let cutFree=0; for(const mat of machine_state[m].assigned){ const c_start=cutFree, c_end=c_start+mat.cut_time, s_end=c_end+T_SORT; mat.outlet='—'; mat.timeline={unload:[c_start,c_start],print:[c_start,c_start],paint:[c_start,c_start],cut:[c_start,c_end],sort:[c_end,s_end]}; cutFree=c_end; records.push(mat); } }
+      return records;
+    }
     const {plans} = _outlet_plans(machine_state, T);
     const outlet_free={}, print_free={}; for(const e of OUTLETS){ outlet_free[e]=0; print_free[e]=0; }
     const prev_on_m={}; const queues={}; const next_plan={};
@@ -365,7 +371,7 @@
           split_threshold_sec:T.splitThresholdSec, max_split_machines:T.maxSplitMachines,
           split_threshold:r1(threshold), dispatch_alpha:T.alpha, dispatch_gamma:T.gamma,
           optimal_makespan:r1(optimal), pipeline_model:'3-slot blocking + 叫料延后 (喷码→去底漆→切割)'},
-        topology:{ outlets:OUTLETS, machines:MACHINES, outlet_to_machines:OUTLET_TO_MACHINES },
+        topology:{ outlets:OUTLETS, machines:MACHINES, outlet_to_machines:OUTLET_TO_MACHINES, bypass_storage:!!T.bypassStorage },
         makespan_cut:r1(mk_cut), makespan_sort:r1(mk_sort),
         num_profiles:materials.length,
         num_parts:materials.reduce((s,m)=>s+m.parts.length,0),
@@ -383,7 +389,7 @@
           assigned_machine:m.assigned_machine, outlet:m.outlet,
           timeline:Object.fromEntries(Object.entries(m.timeline).map(([k,v])=>[k,[r1(v[0]),r1(v[1])]])) })),
       })),
-      outlet_timeline: records.map(m=>({ outlet:m.outlet, start:r1(m.timeline.unload[0]), end:r1(m.timeline.unload[1]),
+      outlet_timeline: (T.bypassStorage?[]:records).map(m=>({ outlet:m.outlet, start:r1(m.timeline.unload[0]), end:r1(m.timeline.unload[1]),
         profile_id:m.profile_id, to_machine:m.assigned_machine }))
         .sort((a,b)=> a.outlet!==b.outlet? cmp(a.outlet,b.outlet) : a.start-b.start),
       machine_timeline: records.map(m=>({ machine:m.assigned_machine, start:r1(m.timeline.cut[0]), end:r1(m.timeline.cut[1]),
@@ -418,7 +424,7 @@
       batchMachine: config.batchMachine || {},
       batchOrder: config.batchOrder || {},
     });
-    if(!T.OUTLETS.length) throw new Error('没有启用的出料口');
+    if(!T.bypassStorage && !T.OUTLETS.length) throw new Error('没有启用的出料口');
     if(!T.MACHINES.length) throw new Error('没有启用的切割机');
     const materials = load_data(db, T.batches);
     preprocess(materials);

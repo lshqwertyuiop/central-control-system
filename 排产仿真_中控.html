@@ -97,6 +97,15 @@
               cursor: pointer; font-size: 12px; background: white; user-select: none; }
   .cfg-chip.on { background: var(--success); color: white; border-color: var(--success); }
   .cfg-chip.off { background: var(--bg); color: var(--text-3); text-decoration: line-through; }
+  .cfg-topology{position:relative;height:300px;margin-top:14px;border:1px solid var(--border-light);border-radius:7px;overflow:hidden;background:linear-gradient(90deg,#fafafa 0 24%,#fff 24% 76%,#fafafa 76%);}
+  .cfg-topology svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;}.cfg-topology .route{fill:none;stroke:var(--success);stroke-width:5;stroke-linecap:round;transition:opacity .2s,stroke .2s;}.cfg-topology .route.off{stroke:#bfbfbf;stroke-dasharray:9 8;}.cfg-topology .route.blocked{opacity:.2;}
+  .cfg-topology .zone{position:absolute;top:13px;font-size:12px;color:var(--text-3);font-weight:600;}.cfg-topology .zone.out{left:20px;}.cfg-topology .zone.cut{right:20px;}.cfg-topology .station{position:absolute;width:112px;background:#fff;border:1px solid var(--border);border-radius:7px;padding:8px 10px;box-shadow:0 1px 4px rgba(0,0,0,.04);}.cfg-topology .station.outlet{left:7%;border-left:4px solid #1677ff;}.cfg-topology .station.machine{right:7%;border-left:4px solid var(--success);}.cfg-topology .station.disabled{border-color:#bfbfbf;border-left-color:#8c8c8c;background:#f5f5f5;color:#8c8c8c;box-shadow:none;}.cfg-topology .station b{font-size:15px;display:block;}.cfg-topology .station span{font-size:12px;color:var(--text-3);}.cfg-topology .station.disabled span{color:#8c8c8c;}
+  @media(max-width:760px){.cfg-topology .station{width:94px;}.cfg-topology .station.outlet{left:3%;}.cfg-topology .station.machine{right:3%;}}
+  /* 紧凑拓扑：节点名称与状态横向排列，保持配置区高度克制。 */
+  .cfg-topology{height:190px;}.cfg-topology .station{width:76px;min-height:32px;padding:6px 8px;display:flex;align-items:center;gap:8px;}.cfg-topology .station b{display:inline;font-size:14px;}.cfg-topology .station span{width:9px;height:9px;border-radius:50%;background:var(--success);font-size:0;}.cfg-topology .station.disabled span{background:#bfbfbf;}
+  .bypass-storage-row{display:flex;align-items:center;gap:9px;margin:0 0 12px;padding:9px 10px;border:1px solid var(--border-light);border-radius:6px;background:#fafafa;font-size:13px;}.bypass-storage-row .hint{color:var(--text-3);font-size:12px;}.switch-toggle{position:relative;width:36px;height:20px;flex:0 0 auto;cursor:pointer;}.switch-toggle input{position:absolute;opacity:0;width:0;height:0;}.switch-toggle i{position:absolute;inset:0;border-radius:12px;background:#bfbfbf;transition:.2s;}.switch-toggle i::after{content:'';position:absolute;width:16px;height:16px;top:2px;left:2px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:.2s;}.switch-toggle input:checked + i{background:var(--primary);}.switch-toggle input:checked + i::after{transform:translateX(16px);}.cfg-chip.disabled{cursor:not-allowed;opacity:.52;filter:grayscale(1);}
+  /* 页面级保存横条：固定于窗口底部，不受左右内容区滚动影响。 */
+  body{padding-bottom:96px;}.save-ribbon{position:fixed;left:0;right:0;bottom:0;height:78px;background:#fff;border-top:1px solid var(--border-light);box-shadow:0 -4px 18px rgba(0,0,0,.10);z-index:90;}.save-ribbon-inner{max-width:calc(100vw - 40px);height:100%;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:12px;}.save-ribbon-fields{display:flex;align-items:center;gap:14px;margin-right:auto;}.save-ribbon-field{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-2);white-space:nowrap;}.save-ribbon .ds-select{height:34px;width:148px;}.save-ribbon-actions{display:flex;align-items:center;gap:10px;}.save-ribbon-actions .btn-primary,.save-ribbon-actions .btn-default{margin:0;}.save-ribbon-actions .btn-primary{padding:9px 20px;font-size:14px;}.save-ribbon-status{font-size:12px;color:var(--text-3);white-space:nowrap;}.save-ribbon-status b{color:var(--primary);font-weight:600;}@media(max-width:760px){body{padding-bottom:132px;}.save-ribbon{height:auto;padding:9px 0;}.save-ribbon-inner{flex-wrap:wrap;}.save-ribbon-fields{order:3;width:100%;margin-right:0;}.save-ribbon-status{display:none;}}
   .gantt-mode-btn { padding: 3px 10px; margin-left: 4px; border: 1px solid var(--border);
                     background: white; border-radius: 4px; cursor: pointer; font-size: 12px; }
   .gantt-mode-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
@@ -209,21 +218,14 @@
     <div id="secProdList">
       <div id="prodList" class="prod-list-wrap"></div>
     </div>
-    <div id="secTopo">
+<div id="secTopo">
+    <div class="bypass-storage-row"><label class="switch-toggle" title="开启后不经过立库，出料口与通路配置将不可用"><input id="bypassStorage" type="checkbox"><i></i></label><strong>不经过立库</strong><span class="hint">开启后，出料口和通路将禁用，切割机仍可配置</span></div>
     <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:8px">
-      <div>
-        <div style="font-size:12px;color:var(--text-2);margin-bottom:6px">出料口启停</div>
-        <div id="cfgOutlets" style="display:flex;gap:8px;flex-wrap:wrap"></div>
-      </div>
-      <div>
-        <div style="font-size:12px;color:var(--text-2);margin-bottom:6px">切割机启停</div>
-        <div id="cfgMachines" style="display:flex;gap:8px;flex-wrap:wrap"></div>
-      </div>
-      <div>
-        <div style="font-size:12px;color:var(--text-2);margin-bottom:6px">通路</div>
-        <div id="cfgEdges" style="display:flex;gap:8px;flex-wrap:wrap"></div>
-      </div>
+      <div><div style="font-size:12px;color:var(--text-2);margin-bottom:6px">出料口启停</div><div id="cfgOutlets" style="display:flex;gap:8px;flex-wrap:wrap"></div></div>
+      <div><div style="font-size:12px;color:var(--text-2);margin-bottom:6px">切割机启停</div><div id="cfgMachines" style="display:flex;gap:8px;flex-wrap:wrap"></div></div>
+      <div><div style="font-size:12px;color:var(--text-2);margin-bottom:6px">通路</div><div id="cfgEdges" style="display:flex;gap:8px;flex-wrap:wrap"></div></div>
     </div>
+    <div id="cfgTopology" class="cfg-topology" aria-label="设备通路拓扑图"></div>
     </div>
     <!-- 隐藏控件：保留默认值供算法使用（数据库 / 切割包 / 拆包参数 / 派单权重） -->
     <div style="display:none">
@@ -269,7 +271,7 @@
     <div class="legend" id="machineGanttLegend"></div>
   </div>
 
-  <div class="card">
+  <div class="card" style="display:none">
     <h2>出料口 Gantt（颜色 = 所属切割包）</h2>
     <div class="gantt-container"><svg id="outletGantt"></svg></div>
     <div class="legend" id="outletGanttLegend"></div>
@@ -369,7 +371,7 @@ let ganttMode = 'batch', batchColorMap = {};
 let batchMachine = {};
 let batchOrder = {};
 let allPartsRows = [];
-let cfgOutlets = {}, cfgMachines = {}, cfgEdges = {};
+let cfgOutlets = {}, cfgMachines = {}, cfgEdges = {}, bypassStorage = false;
 // 数据源状态
 let availableDatabases = [];    // [{path, name, size_kb, material_count}]
 let selectedDb = '';            // 当前选中的 db 相对路径
@@ -548,35 +550,27 @@ function init() {
 
 function buildDefaultConfig() {
   const ALL_OUTLETS=['E1','E2'], ALL_MACHINES=['C1','C2','C3'];
-  const ALL_EDGES=[['E1','C1'],['E1','C2'],['E2','C2'],['E2','C3']];
+  const ALL_EDGES=[['E1','C1'],['E1','C2'],['E1','C3'],['E2','C2'],['E2','C3']];
   for (const e of ALL_OUTLETS) cfgOutlets[e] = data.meta.topology.outlets.includes(e);
   for (const m of ALL_MACHINES) cfgMachines[m] = data.meta.topology.machines.includes(m);
-  for (const [e,m] of ALL_EDGES)
-    cfgEdges[`${e}-${m}`] = (data.meta.topology.outlet_to_machines[e] || []).includes(m);
+  for (const [e,m] of ALL_EDGES) cfgEdges[`${e}-${m}`] = (data.meta.topology.outlet_to_machines[e] || []).includes(m);
 }
-
 function renderConfigPanel() {
-  const render = (id, items, key) => {
-    document.getElementById(id).innerHTML = items.map(it => {
-      const on = key==='cfgEdges' ? cfgEdges[it] : (key==='cfgOutlets' ? cfgOutlets[it] : cfgMachines[it]);
-      return `<span class="cfg-chip ${on?'on':'off'}" data-key="${key}" data-id="${it}">${it}</span>`;
-    }).join('');
-  };
-  render('cfgOutlets', Object.keys(cfgOutlets), 'cfgOutlets');
-  render('cfgMachines', Object.keys(cfgMachines), 'cfgMachines');
-  render('cfgEdges', Object.keys(cfgEdges), 'cfgEdges');
-  document.querySelectorAll('.cfg-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const k=chip.dataset.key, id=chip.dataset.id;
-      const store = k==='cfgOutlets'?cfgOutlets:(k==='cfgMachines'?cfgMachines:cfgEdges);
-      store[id] = !store[id];
-      renderConfigPanel();
-    });
-  });
+  const render = (id, items, key) => { document.getElementById(id).innerHTML = items.map(it => { const on = key==='cfgEdges' ? cfgEdges[it] : (key==='cfgOutlets' ? cfgOutlets[it] : cfgMachines[it]); const disabled = bypassStorage && (key==='cfgOutlets' || key==='cfgEdges'); return `<span class="cfg-chip ${on?'on':'off'} ${disabled?'disabled':''}" data-key="${key}" data-id="${it}" aria-disabled="${disabled}">${it}</span>`; }).join(''); };
+  render('cfgOutlets', Object.keys(cfgOutlets), 'cfgOutlets'); render('cfgMachines', Object.keys(cfgMachines), 'cfgMachines'); render('cfgEdges', Object.keys(cfgEdges), 'cfgEdges');
+  document.querySelectorAll('.cfg-chip').forEach(chip => { chip.addEventListener('click', () => { const k=chip.dataset.key,id=chip.dataset.id; if (bypassStorage && (k==='cfgOutlets'||k==='cfgEdges')) return; const store=k==='cfgOutlets'?cfgOutlets:(k==='cfgMachines'?cfgMachines:cfgEdges); store[id]=!store[id]; renderConfigPanel(); }); });
+  const bypass=document.getElementById('bypassStorage'); if(bypass){bypass.checked=bypassStorage;bypass.onchange=()=>{bypassStorage=bypass.checked;renderConfigPanel();};} renderConfigTopology();
 }
-
+function renderConfigTopology() {
+  const host=document.getElementById('cfgTopology'); if(!host)return;
+  const routes=[['E1','C1','M 210 68 C 390 68,590 50,790 50'],['E1','C2','M 210 68 C 410 68,590 95,790 95'],['E1','C3','M 210 68 C 480 68,530 140,790 140'],['E2','C2','M 210 140 C 420 140,560 95,790 95'],['E2','C3','M 210 140 C 390 140,590 140,790 140']];
+  const routeHtml=routes.map(([out,m,d])=>{const enabled=!!cfgEdges[`${out}-${m}`],usable=!bypassStorage&&enabled&&cfgOutlets[out]&&cfgMachines[m];return `<path class="route ${enabled?'':'off'} ${usable?'':'blocked'}" d="${d}"/>`;}).join('');
+  const card=(key,type,top,on)=>`<div class="station ${type} ${on?'':'disabled'}" style="top:${top}px" title="${key} ${on?'启用':'停用'}"><b>${key}</b><span></span></div>`;
+  host.innerHTML='<span class="zone out">出料口</span><span class="zone cut">切割机</span><svg viewBox="0 0 1000 190" preserveAspectRatio="none">'+routeHtml+'</svg>'+card('E1','outlet',52,!bypassStorage&&!!cfgOutlets.E1)+card('E2','outlet',124,!bypassStorage&&!!cfgOutlets.E2)+card('C1','machine',34,!!cfgMachines.C1)+card('C2','machine',79,!!cfgMachines.C2)+card('C3','machine',124,!!cfgMachines.C3);
+}
 async function doRecalc() {
   const topology = {
+    bypass_storage: bypassStorage,
     outlets: Object.fromEntries(Object.entries(cfgOutlets).map(([k,v])=>[k,{enabled:v}])),
     machines: Object.fromEntries(Object.entries(cfgMachines).map(([k,v])=>[k,{enabled:v}])),
     edges: Object.entries(cfgEdges).filter(([_,v])=>v).map(([k])=>k.split('-')),
@@ -1423,24 +1417,27 @@ function applyLayout(){
     topoPanel.body.appendChild(secRecalc);
   }
   stack.appendChild(topoPanel.box);
-  // 保存此次排产置于任务列表、通路配置之后，统一填写生产日期与排产序号。
+  // 保存栏固定在页面底部，生产日期、排产序号与操作按钮不随两栏滚动。
   if(secDate){
-    var datePanel = mkPanel('保存此次排产', '填写排产信息后保存', null);
-    secDate.style.cssText='display:flex;align-items:center;gap:10px;margin:0;';
+    var saveRibbon=document.createElement('div'); saveRibbon.className='save-ribbon';
+    var saveRibbonInner=document.createElement('div'); saveRibbonInner.className='save-ribbon-inner'; saveRibbon.appendChild(saveRibbonInner);
+    var saveFields=document.createElement('div'); saveFields.className='save-ribbon-fields'; saveRibbonInner.appendChild(saveFields);
+    secDate.style.cssText='display:flex;align-items:center;gap:7px;margin:0;';
+    secDate.className='save-ribbon-field';
+    saveFields.appendChild(secDate);
     var now=new Date();
     var defaultSchedNo='SCH-'+now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'-'+String(Math.floor(Math.random()*900)+100);
     var schedNoRow=document.createElement('div');
-    schedNoRow.style.cssText='display:flex;align-items:center;gap:10px;margin-top:12px;';
+    schedNoRow.className='save-ribbon-field';
     schedNoRow.innerHTML='<span class="ds-label">排产序号</span><input id="scheduleNo" type="text" class="ds-select" style="width:160px" value="'+defaultSchedNo+'">';
-    datePanel.body.appendChild(schedNoRow);
-    secDate.style.marginTop='12px';
-    datePanel.body.appendChild(secDate);
+    saveFields.appendChild(schedNoRow);
+    var saveStatus=document.createElement('span'); saveStatus.className='save-ribbon-status'; saveStatus.innerHTML='当前为草稿，<b>尚未保存</b>'; saveRibbonInner.appendChild(saveStatus);
     var saveActions=document.createElement('div');
-    saveActions.style.cssText='display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border-light);';
+    saveActions.className='save-ribbon-actions';
     var cancel=document.getElementById('prodCancelBtn'), sv=document.getElementById('prodSaveBtn');
     if(cancel) saveActions.appendChild(cancel); if(sv) saveActions.appendChild(sv);
-    datePanel.body.appendChild(saveActions);
-    stack.appendChild(datePanel.box);
+    saveRibbonInner.appendChild(saveActions);
+    document.body.appendChild(saveRibbon);
   }
   side.appendChild(stack);
   // 汇总指标 KPI（在 Gantt 上方）
@@ -1449,7 +1446,7 @@ function applyLayout(){
   var detCard=mkCard('排产详情');
   var gmFlat=flat(cardByTitle('切割机 Gantt')); if(gmFlat) detCard.appendChild(gmFlat);
   var d1=mkCollapse('展开全部', false);
-  ['出料口 Gantt','换盘'].forEach(function(t){ var c=flat(cardByTitle(t)); if(c) d1.body.appendChild(c); });
+  ['换盘'].forEach(function(t){ var c=flat(cardByTitle(t)); if(c) d1.body.appendChild(c); });
   d1.card.style.marginTop='14px';
   detCard.appendChild(d1.card);
   main.appendChild(detCard);
@@ -1619,7 +1616,9 @@ function openProfileDetail(profileId){
     +'<tr><th>所属工单</th><td>'+(pkg?pkg.batch_id:'-')+'</td>'
     +'<th>船号/分段</th><td>'+((pkg?pkg.ship:'')+' · '+(pkg?pkg.segment:''))+'</td></tr>'
     +'<tr><th>切割机</th><td>'+(mat.assigned_machine||mgItem.machine||'-')+'</td>'
-    +'<th>出料口</th><td>'+(mat.outlet||otItem.outlet||'-')+'</td></tr>'
++'<th>出料口</th><td>'+(mat.outlet||otItem.outlet||'-')+'</td></tr>'
+
+
     +'<tr><th>规格</th><td>'+(mat.section_size||'-')+'</td>'
     +'<th>长度</th><td>'+(mat.length!=null?mat.length+' mm':'-')+'</td></tr>'
     +'<tr><th>零件数</th><td>'+((mat.part_count!=null?mat.part_count:(mat.parts?mat.parts.length:'-'))+' 件')+'</td>'
@@ -1981,6 +1980,7 @@ function rerenderAll(){
 }
 doRecalc = function () {
   var topology = {
+    bypass_storage: bypassStorage,
     outlets: Object.fromEntries(Object.entries(cfgOutlets).map(function(kv){return [kv[0],{enabled:kv[1]}];})),
     machines: Object.fromEntries(Object.entries(cfgMachines).map(function(kv){return [kv[0],{enabled:kv[1]}];})),
     edges: Object.entries(cfgEdges).filter(function(kv){return kv[1];}).map(function(kv){return kv[0].split('-');}),
@@ -2009,3 +2009,13 @@ loadData();
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+

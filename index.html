@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
@@ -134,6 +134,16 @@
     .kb-table .kb-row-dragover > td { border-top: 2px solid #fa8c16 !important; background:#fff7e6; }
     /* 加工任务列表固定高度：任务较少时也保持一致的可视区域 */
     .kb-table .ant-table-body { height: 520px !important; max-height: 520px !important; }
+    /* 加工任务双视图：切换器固定在统一页头，避免列表与队列视图的入口位置、留白不一致。 */
+    .kb-view-header { min-height:48px; margin-bottom:12px; padding:0 14px; display:flex; align-items:center; justify-content:space-between; gap:12px; background:#fff; border:1px solid #f0f0f0; border-radius:6px; }
+    .kb-view-title { font-size:15px; font-weight:600; color:#262626; }
+    .kb-view-switch .ant-radio-button-wrapper { min-width:76px; text-align:center; }
+    @media(max-width:560px){ .kb-view-header{padding:10px 12px; align-items:flex-start; flex-direction:column;} }
+    /* 两个模式的内容标题、页签使用相同的视觉规格。 */
+    .kb-mode-card > .ant-card-head { min-height:44px; padding:0 14px; }
+    .kb-mode-card > .ant-card-head .ant-card-head-title { font-size:14px; font-weight:600; }
+    .kb-mode-card .ant-tabs-nav { margin-bottom:12px; }
+    .kb-mode-card .ant-tabs-tab { padding:11px 0; font-size:13px; }
     .sched-gantt { border:1px solid #f0f0f0; border-radius:6px; background:#fafbfc; padding:6px 4px; }
     .kb-prog { display:flex; flex-direction:column; gap:3px; }
     .kb-prog-bar { display:flex; gap:3px; }
@@ -145,7 +155,7 @@
     .kb-prog-cur-plan, .kb-prog-cur-migrate { background:#1677ff; box-shadow:0 0 0 2px rgba(22,119,255,.18); }
     .plan-prog .kb-prog-seg { width:24px; }
     .kb-prog-label { font-size:11px; color:#6b7280; white-space:nowrap; }
-    .kbq-wrap { margin-top:14px; border-color:#f0f0f0; }
+    .kbq-wrap { margin-top:0; border-color:#f0f0f0; }
     .kbq-wrap > .ant-card-head { min-height:44px; padding:0 14px; }
     .kbq-wrap > .ant-card-head .ant-card-head-title { font-size:14px; font-weight:600; }
     .kbq-wrap > .ant-card-body { padding:0 14px 14px; }
@@ -195,6 +205,25 @@
     .kbq-cut-item.is-selected { border-color:#e85b00; background:#fff7e6; box-shadow:0 0 0 2px rgba(232,91,0,.12); }
     .kbq-cut-top { display:flex; align-items:center; justify-content:space-between; gap:6px; }
     .kbq-cut-id { font:600 12px Consolas,monospace; color:#1f2937; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .kbq-group-label { display:block; margin-bottom:2px; font-size:10px; font-weight:700; letter-spacing:.4px; color:#8c8c8c; }
+    .kbq-group-summary { margin-top:7px; padding:7px 8px; border-radius:4px; background:#f6faff; border:1px solid #d6e4ff; }
+    .kbq-group-summary-head { display:flex; justify-content:space-between; gap:8px; font-size:11px; color:#4b5563; }
+    .kbq-profile-chips { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; }
+    .kbq-profile-chip { max-width:100%; padding:2px 5px; border-radius:3px; font:11px Consolas,monospace; color:#1d4ed8; background:#e6f4ff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; }
+    .kbq-profile-chip:hover { background:#bae0ff; }
+    .kbq-group-tasks { margin-top:6px; font-size:11px; color:#8c8c8c; }
+    /* 型材组卡片：沿用“生产任务卡片”最终定稿的紧凑信息层级。 */
+    .kbq-group-card { position:relative; padding:13px 16px 13px 30px; border-color:#dbe3eb; border-radius:5px; box-shadow:0 3px 14px rgba(57,80,105,.05); }
+    .kbq-group-card .kbq-cut-top { min-height:25px; }
+    .kbq-group-card .kbq-cut-id { font-size:14px; color:#193c65; }
+    .kbq-group-time { display:inline-flex; align-items:center; margin-left:8px; padding:2px 7px; border-radius:10px; background:#eff7ff; color:#3171b4; font-size:12px; white-space:nowrap; }
+    .kbq-group-time::before { content:'●'; font-size:9px; color:#4d93e8; margin-right:4px; }
+    .kbq-drag-dots { display:inline-block; width:8px; height:14px; flex:none; cursor:grab; background:radial-gradient(circle,#8d9bab 1.35px,transparent 1.6px) 0 0/5px 5px; }
+    .kbq-group-drag { position:absolute; left:12px; top:19px; }
+    .kbq-group-card .kbq-cut-meta { margin-top:8px; padding-top:8px; border-top:1px dashed #e0e7ee; color:#61758f; }
+    .kbq-group-card .kbq-group-summary { margin-top:10px; padding:7px; border-color:#cfe0fb; border-radius:4px; background:#f7fbff; }
+    .kbq-group-card .kbq-group-summary-head { color:#446383; font-weight:600; }
+    .kbq-group-card .kbq-profile-chip { padding:3px 5px; border-radius:3px; background:#e6f2ff; color:#075ae2; }
     .kbq-card-status { margin-top:5px; min-height:22px; display:flex; align-items:center; gap:4px; }
     .kbq-outlet-card { cursor:pointer; }
     .kbq-outlet-card.is-pending { cursor:grab; }
@@ -1038,12 +1067,12 @@ const KB_LANES = [
   { id:4, label:'分拣',  icon:'🗂️', color:'green',  statuses:['切割完成','分拣中','分拣完成'],             curPool:null, nextPool:null },
 ];
 const KB_STATUS_COLOR = {
-  '未叫料':'default','待出库':'orange','已叫料':'purple',
+  '未叫料':'default','待出库':'orange','已叫料':'purple','叫料中':'purple','排队中':'default',
   '出库中':'processing','出库完成':'success','喷码中':'gold',
   '喷码完成':'success','去底漆中':'gold','去底漆完成':'success','切割中':'gold',
   '切割完成':'success','分拣中':'gold','分拣完成':'success',
 };
-const kbDisplayStatus = (status) => status === '未叫料' ? '未开始' : status;
+const kbDisplayStatus = (status) => (status === '未叫料' || status === '排队中') ? '待出库' : status;
 const kbRand = arr => arr[Math.floor(Math.random()*arr.length)];
 const KB_SPECS = ['250×90×10×15','200×90×9×14','180×75×8×12','300×100×11×16','220×95×10×14'];
 const KB_PROGS = ['PX','PY','PZ','PJ'];
@@ -1055,11 +1084,21 @@ const KB_STAGE = {  // 看板状态 → PROCESS_FLOW 阶段索引
   '未叫料':0,'待出库':1,'已叫料':2,'出库中':3,'出库完成':3,'喷码中':4,'喷码完成':4,
   '去底漆中':4,'去底漆完成':4,'切割中':5,'切割完成':5,'分拣中':6,'分拣完成':6,
 };
+const KB_PROFILE_PROCESS_STATUSES = ['未叫料','已叫料','出库中','出库完成','喷码中','喷码完成','去底漆中','去底漆完成','切割中','切割完成','分拣中','分拣完成'];
+// 每台切割机是一条独立流水线：六个在制工位均最多容纳一根型材。
+// 数组顺序为队首至队尾，后续型材只在队列中等待。
+const KB_CUT_PIPELINE_SLOTS = ['分拣中','切割中','去底漆中','喷码中','出库中','叫料中'];
+const kbProfileStatus = (profile, groupStatus, index=0) => {
+  if (profile.status) return profile.status;
+  // 型材组只是串行队列容器。未提供独立状态时，仅队首型材继承当前流水线状态；
+  // 其余型材一律保持“排队中”，不能用下标虚构多个同时加工的工序状态。
+  return index===0 ? groupStatus : '排队中';
+};
 // 加工进度（5 步）：出库 → 喷码 → 去底漆 → 切割 → 分拣
 const KB_PROG_STEPS = ['出库','喷码','去底漆','切割','分拣'];
 // [已完成步数, 进行中步索引(-1=无)]：区分 未开始 / 进行中 / 步间等待 / 全部完成
 const KB_PROG_STAGE = {
-  '未叫料':   [0,-1], '待出库':   [0,-1], '已叫料':   [0,-1],
+  '未叫料':   [0,-1], '待出库':   [0,-1], '已叫料':   [0,-1], '排队中': [0,-1],
   '出库中':   [0, 0], '出库完成': [1,-1],
   '喷码中':   [1, 1], '喷码完成': [2,-1],
   '去底漆中': [2, 2], '去底漆完成':[3,-1],
@@ -1165,10 +1204,32 @@ const makeKanbanItems = () => {
       }
       const taskNo = 'OUT-2026-'+padZ(num,4);
       const reports = buildItemReports(taskNo, profileId, profileType, shipNo, blockNo, packageNo, status);
+      // 假数据按型材组生成 10–20 根型材，用于验证切割机任务下的型材组聚合展示。
+      const profileCount = rnd(11)+10;
+      const outlet = kbRand(KB_STATIONS.E);
+      const sprayStation = kbRand(KB_STATIONS.P);
+      const cutStation = kbRand(KB_STATIONS.C);
+      const profiles = Array.from({length:profileCount}, (_,profileIndex) => ({
+        key:`${profileId}-${profileIndex+1}`,
+        profileId:profileIndex===0 ? profileId : `${profileId}-${padZ(profileIndex+1,2)}`,
+        nestingLayoutNo:profileIndex===0 ? nestingLayoutNo : `${nestingLayoutNo}-${padZ(profileIndex+1,2)}`,
+        profileType,
+        length:profileIndex===0 ? length : pick(KB_LENGTHS),
+        partsQty:profileIndex===0 ? parts.length : rnd(6)+3,
+        outlet, sprayStation, cutStation,
+        // 同一型材组在流水线上严格串行：仅当前队首型材拥有工序状态，后续型材排队等待。
+        status:profileIndex===0 ? status : '排队中',
+      }));
+      const partsQty = profiles.reduce((sum, profile) => sum + profile.partsQty, 0);
       items.push({
         id: 'MAT-'+String(num).padStart(3,'0'),
         lane: cfg.id,
         taskNo,
+        profileGroupId:`PG-${packageNo}-${padZ(num,2)}`,
+        profileGroupNo:`${packageNo}-G${padZ(num,2)}`,
+        profileGroupName:`${packageNo} 型材组`,
+        profileCount, partsQty, cutTime:rnd(240)+60,
+        profiles,
         profileId, profileType, shipNo, blockNo, packageNo,
         nestingLayoutNo, programNo, material, length, parts,
         outboundPort: Math.random()>0.5 ? '出库口1' : '出库口2',
@@ -1180,9 +1241,9 @@ const makeKanbanItems = () => {
         ...kbPush(status),
         finishTime: randTime(),
         source: 'PLAN',
-        outlet: kbRand(KB_STATIONS.E),       // 出库口（先前定下，可修改）
-        sprayStation: kbRand(KB_STATIONS.P), // 喷码工位（先前定下，可修改）
-        cutStation: kbRand(KB_STATIONS.C),   // 切割工位（先前定下，可修改）
+        outlet,       // 型材组统一的出库口
+        sprayStation, // 型材组统一的喷码工位
+        cutStation,   // 同一型材组固定到同一台切割机
         realtimeStock: 1,
         uiState: 'pending',       // pending | loading | success | conflict | error
         editingField: null,       // 'outlet' | 'cut'
@@ -1194,19 +1255,37 @@ const makeKanbanItems = () => {
   return items;
 };
 
-const KB_QUEUE_GANTT_ENABLED = new URLSearchParams(window.location.search).get('queueView') === 'gantt';
-const redistributePendingTasks = (items, field, station, alternatives) => alternatives.length ? (()=>{let cursor=0;return items.map(item=>(['未叫料','待出库'].includes(item.status)&&item[field]===station)?{...item,[field]:alternatives[cursor++%alternatives.length]}:item);})() : items;
-const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder, onDisableAndReschedule }) => {
+const KB_QUEUE_GANTT_ENABLED = true;
+const profileGroupKey = (item) => item.profileGroupId || item.profileGroupNo || item.id;
+// 切割机重新排产按型材组分配，且含有已叫料/加工中任务的型材组保持原机，避免同组型材被拆到不同切割机。
+const redistributePendingTasks = (items, field, station, alternatives) => alternatives.length ? (()=>{
+  const movable = item => ['未叫料','待出库'].includes(item.status) && item[field]===station;
+  const lockedGroups = new Set(items.filter(item => item[field]===station && !movable(item)).map(profileGroupKey));
+  const groupStations = new Map(); let cursor=0;
+  return items.map(item => {
+    if (!movable(item) || (field==='cutStation' && lockedGroups.has(profileGroupKey(item)))) return item;
+    const group = profileGroupKey(item);
+    if (!groupStations.has(group)) groupStations.set(group, alternatives[cursor++%alternatives.length]);
+    return {...item,[field]:groupStations.get(group)};
+  });
+})() : items;
+const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onViewProfile, onReorder, onDisableAndReschedule, onRecallGroup, onRecallProfiles, onRecallStation }) => {
   const [outletEnabled, setOutletEnabled] = useState({ E1:true, E2:true });
   const [sprayEnabled, setSprayEnabled] = useState({ P1:true, P2:true });
   const [cutEnabled, setCutEnabled] = useState({ C1:true, C2:true, C3:true });
   const [queueOrder, setQueueOrder] = useState(()=>tasks.map(t=>t.id));
   const [sprayOrder, setSprayOrder] = useState(()=>tasks.map(t=>t.id));
   const [cutOrder, setCutOrder] = useState(()=>tasks.map(t=>t.id));
+  const [cutGroupDetail, setCutGroupDetail] = useState(null);
+  const [profileOrders, setProfileOrders] = useState({});
+  const [selectedGroupIds, setSelectedGroupIds] = useState([]);
+  const [selectedProfileKeys, setSelectedProfileKeys] = useState([]);
   const [dragOverId, setDragOverId] = useState(null);
   const queueDragId = useRef(null);
   const sprayDragId = useRef(null);
   const cutDragId = useRef(null);
+  const cutGroupDragId = useRef(null);
+  const profileDragId = useRef(null);
   useEffect(()=>setQueueOrder(prev=>[
     ...prev.filter(id=>tasks.some(t=>t.id===id)),
     ...tasks.map(t=>t.id).filter(id=>!prev.includes(id)),
@@ -1230,11 +1309,29 @@ const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder,
   const orderIndex = (order,id) => { const i=order.indexOf(id); return i<0?9999:i; };
   const laneTasks = Object.fromEntries(cuts.map(c => [c, tasks.filter(t=>t.cutStation===c).sort((a,b)=>statusRank(a)-statusRank(b)||orderIndex(cutOrder,a.id)-orderIndex(cutOrder,b.id))]));
   const laneTotals = Object.fromEntries(cuts.map(c => [c, laneTasks[c].reduce((sum,t)=>sum+cutMinutes(t),0)]));
+  // 切割机下先聚合型材组：同一型材组的任务不再平铺，便于查看“设备 → 型材组 → 组内型材”的关系。
+  const cutGroupLanes = Object.fromEntries(cuts.map(cut => [cut, Object.values(laneTasks[cut].reduce((groups, task) => {
+    const id = task.profileGroupId || task.profileGroupNo || task.id;
+    if (!groups[id]) groups[id] = {
+      id, groupNo:task.profileGroupNo || task.nestingLayoutNo || id,
+      groupName:task.profileGroupName || '型材组', packageNo:task.packageNo,
+      tasks:[], profiles:[], profileEntries:[], profileCount:0, partsQty:0, minutes:0,
+    };
+    const group = groups[id];
+    group.tasks.push(task);
+    const taskProfiles=task.profiles?.length ? task.profiles : [task];
+    group.profiles.push(...taskProfiles);
+    group.profileEntries.push(...taskProfiles.map(profile=>({profile,task})));
+    group.profileCount += Number(task.profileCount) || 1;
+    group.partsQty += Number(task.partsQty) || 0;
+    group.minutes += cutMinutes(task);
+    return groups;
+  }, {}))]));
   const sprayQueueTasks = tasks.filter(t=>kbSeqOf(t.status)<=kbSeqOf('喷码中'));
   const sprayRank = (task) => task.status==='未叫料'||task.status==='已叫料'?2:(task.status==='喷码中'?0:1);
   const sprayLanes = Object.fromEntries(sprays.map(p=>[p,sprayQueueTasks.filter(t=>t.sprayStation===p).sort((a,b)=>sprayRank(a)-sprayRank(b)||orderIndex(sprayOrder,a.id)-orderIndex(sprayOrder,b.id))]));
   const progressInfo = (task) => {
-    if (task.status==='未叫料') return {percent:0,label:'待下发'};
+    if (task.status==='未叫料') return {percent:0,label:'待出库'};
     if (task.status==='已叫料') return {percent:0,label:'已叫料'};
     const pair=KB_PROG_STAGE[task.status]||[0,-1];
     return {percent:Math.min(100,Math.round((pair[0]+(pair[1]>=0?.5:0))/KB_PROG_STEPS.length*100)),label:task.status};
@@ -1242,12 +1339,12 @@ const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder,
   const requestAvailabilityChange = (kind, station, nextEnabled, enabledMap, setEnabled) => {
     if (nextEnabled) { setEnabled(prev=>({...prev,[station]:true})); return; }
     const kindLabel=kind==='outlet'?'出库口':(kind==='spray'?'喷码工位':'切割机');
-    const alternatives=Object.keys(enabledMap).filter(key=>key!==station&&enabledMap[key]);
+    const recallable=tasks.filter(task=>task[ kind==='outlet'?'outlet':(kind==='spray'?'sprayStation':'cutStation') ]===station && ['未叫料','已叫料','待出库'].includes(task.status)).length;
     Modal.confirm({
-      title:`禁用 ${station} ${kindLabel}`,
-      content:`是否重新排产，将 ${station} 中的未开始和待出库任务发送给其他可用${kindLabel}？已叫料和加工中任务不会变更。`,
-      okText:'禁用并重新排产', cancelText:'取消',
-      onOk:()=>{ setEnabled(prev=>({...prev,[station]:false})); onDisableAndReschedule?.(kind,station,alternatives); },
+      title:`禁用并撤回 ${station} ${kindLabel}`,
+      content:`${station} 中 ${recallable} 个待处理型材组将撤回至排产任务；加工中的型材不受影响。是否继续？`,
+      okText:'禁用并撤回', okButtonProps:{danger:true}, cancelText:'取消',
+      onOk:()=>{ setEnabled(prev=>({...prev,[station]:false})); onRecallStation?.(kind,station); },
       footer:(_, {OkBtn,CancelBtn})=>React.createElement(Space,null,
         React.createElement(CancelBtn),
         React.createElement(Button,{onClick:()=>{
@@ -1288,8 +1385,43 @@ const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder,
     });
     if (dragged.status==='未叫料' && target.status==='未叫料') onReorder?.(dragId,targetId);
   };
+  const entryKey = (entry, index=0) => `${entry.task.id}::${entry.profile.profileId||entry.profile.key||index}`;
+  const orderProfileEntries = (group) => {
+    const entries=group.profileEntries||[];
+    const order=profileOrders[group.id];
+    if (!order) return entries;
+    const byKey=new Map(entries.map((entry,index)=>[entryKey(entry,index),entry]));
+    return [...order.map(key=>byKey.get(key)).filter(Boolean),...entries.filter((entry,index)=>!order.includes(entryKey(entry,index)))];
+  };
+  const reorderCutGroup = (cut, dragGroupId, targetGroupId) => {
+    if (!dragGroupId || dragGroupId===targetGroupId) return;
+    const groups=cutGroupLanes[cut]||[];
+    const dragged=groups.find(group=>group.id===dragGroupId), target=groups.find(group=>group.id===targetGroupId);
+    if (!dragged || !target) return;
+    const movedIds=dragged.tasks.map(task=>task.id), targetId=target.tasks[0]?.id;
+    setCutOrder(prev=>{
+      const next=prev.filter(id=>!movedIds.includes(id));
+      const at=next.indexOf(targetId);
+      next.splice(at<0?next.length:at,0,...movedIds);
+      return next;
+    });
+  };
+  const reorderGroupProfile = (group, dragKey, targetKey) => {
+    if (!dragKey || dragKey===targetKey) return;
+    const entries=orderProfileEntries(group);
+    const keys=entries.map((entry,index)=>entryKey(entry,index));
+    const from=keys.indexOf(dragKey), to=keys.indexOf(targetKey);
+    if (from<0 || to<0) return;
+    const next=keys.slice(); const [moved]=next.splice(from,1); next.splice(to,0,moved);
+    setProfileOrders(prev=>({...prev,[group.id]:next}));
+    setCutGroupDetail(prev=>prev?.id===group.id ? {...prev,profileEntries:next.map(key=>entries.find((entry,index)=>entryKey(entry,index)===key)).filter(Boolean)} : prev);
+  };
+  const openCutGroup = (group, cut, queueIndex, profileStatuses) => {
+    setSelectedProfileKeys([]);
+    setCutGroupDetail({...group, cut, queueIndex, profileStatuses});
+  };
   const tip = (task, minutes, phase='切割') => React.createElement('div',{style:{fontSize:12,lineHeight:1.7}},
-    React.createElement('div',{style:{fontWeight:700}},task.nestingLayoutNo),
+    React.createElement('div',{style:{fontWeight:700}},task.profileGroupNo||task.nestingLayoutNo),
     React.createElement('div',null,`工单号：${task.packageNo}`),
     React.createElement('div',null,`型材规格：${task.profileType}`),
     React.createElement('div',null,`长度：${task.length} mm`),
@@ -1312,13 +1444,13 @@ const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder,
               className:'kbq-cut-item kbq-outlet-card'+(running?' is-running':'')+(pending?' is-pending':'')+(selected?' is-selected':'')+(dragOverId===task.id?' is-dragover':''),
               draggable:pending,
               onDragStart:()=>{if(pending)queueDragId.current=task.id;},
-              onDragOver:e=>{if(pending){e.preventDefault();setDragOverId(task.id);}},
+              onDragOver:e=>{const dragged=tasks.find(t=>t.id===queueDragId.current);if(pending&&dragged?.outlet===outlet){e.preventDefault();setDragOverId(task.id);}},
               onDragEnd:()=>{queueDragId.current=null;setDragOverId(null);},
               onDrop:e=>{e.preventDefault();reorderOutlet(task.id,outlet);queueDragId.current=null;setDragOverId(null);},
               onClick:()=>selectAndReveal(task),
             },
               React.createElement('div',{className:'kbq-cut-top'},
-                React.createElement('span',{className:'kbq-cut-id'},task.nestingLayoutNo),
+                React.createElement('span',{className:'kbq-cut-id'},task.profileGroupNo||task.nestingLayoutNo),
                 pending&&React.createElement('span',{className:'kbq-drag',title:'拖动调整出库顺序'},'⠿')
               ),
               React.createElement('div',{className:'kbq-card-status'},
@@ -1326,11 +1458,11 @@ const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder,
                 called?React.createElement(Tag,{color:'purple',style:{margin:0}},'已叫料'):
                 waitingOut?React.createElement(Tag,{color:'orange',style:{margin:0}},'待出库'):
                 React.createElement(React.Fragment,null,
-                  React.createElement(Tag,{style:{margin:0}},'未开始'),
+                  React.createElement(Tag,{color:'orange',style:{margin:0}},'待出库'),
                   React.createElement(Tag,{color:task.realtimeStock>0?'success':'error',style:{margin:0}},task.realtimeStock>0?'有料':'缺料')
                 )
               ),
-              React.createElement('div',{className:'kbq-cut-meta'},`${task.profileType} · ${task.length} mm · ${task.packageNo}`)
+              React.createElement('div',{className:'kbq-cut-meta'},`${task.profileCount||1} 根 · ${task.partsQty||0} 件 · ${task.packageNo}`)
               )
           );
         }))
@@ -1348,25 +1480,25 @@ const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder,
         React.createElement('span',null,`预计全部完成 ${finishAt.format('HH:mm')}`)
       ),
       React.createElement('div',{className:'kbq-cut-list'},list.length?list.map(task=>{
-        const active=task.status==='喷码中', waiting=task.status==='未叫料'||task.status==='已叫料', selected=selectedRowKeys.includes(task.id), prog=progressInfo(task);
+        const active=task.status==='喷码中', waiting=task.status==='未叫料', selected=selectedRowKeys.includes(task.id), prog=progressInfo(task);
         return React.createElement(Tooltip,{key:task.id,title:tip(task,sprayMinutes(task),'喷码')},
           React.createElement('div',{
             className:'kbq-cut-item kbq-outlet-card'+(active?' is-running':'')+(waiting?' is-pending':'')+(selected?' is-selected':'')+(dragOverId===task.id?' is-dragover':''),
             draggable:waiting,
             onDragStart:()=>{if(waiting)sprayDragId.current=task.id;},
-            onDragOver:e=>{if(waiting){e.preventDefault();setDragOverId(task.id);}},
+            onDragOver:e=>{const dragged=tasks.find(t=>t.id===sprayDragId.current);if(waiting&&dragged?.sprayStation===spray){e.preventDefault();setDragOverId(task.id);}},
             onDragEnd:()=>{sprayDragId.current=null;setDragOverId(null);},
             onDrop:e=>{e.preventDefault();reorderWaiting(sprayDragId.current,task.id,'sprayStation',spray,setSprayOrder);sprayDragId.current=null;setDragOverId(null);},
             onClick:()=>selectAndReveal(task)
           },
             React.createElement('div',{className:'kbq-cut-top'},
-              React.createElement('span',{className:'kbq-cut-id'},task.nestingLayoutNo),
+              React.createElement('span',{className:'kbq-cut-id'},task.profileGroupNo||task.nestingLayoutNo),
               waiting&&React.createElement('span',{className:'kbq-drag',title:'拖动调整喷码顺序'},'⠿')
             ),
             React.createElement('div',{className:'kbq-card-status'},
               React.createElement(Tag,{color:KB_STATUS_COLOR[task.status]||'default',style:{margin:0}},kbDisplayStatus(task.status)),
             ),
-            React.createElement('div',{className:'kbq-cut-meta'},`${task.profileType} · ${task.length} mm · ${task.packageNo}`)
+            React.createElement('div',{className:'kbq-cut-meta'},`${task.profileCount||1} 根 · ${task.partsQty||0} 件 · ${task.packageNo}`)
           )
         );
       }):React.createElement('div',{className:'kbq-empty'},'暂无任务'))
@@ -1375,59 +1507,137 @@ const ProcessingQueueGantt = ({ tasks, selectedRowKeys, onSelectTask, onReorder,
   const outletContent = outletGrid;
   const sprayContent = sprayGrid;
   const cutContent = React.createElement('div',{className:'kbq-cut-grid'},cuts.map(cut=>{
-    const list=laneTasks[cut], availableAt=now.add(busyMinutes[cut],'minute'), finishAt=availableAt.add(laneTotals[cut],'minute');
+    const list=laneTasks[cut], groups=cutGroupLanes[cut], availableAt=now.add(busyMinutes[cut],'minute'), finishAt=availableAt.add(laneTotals[cut],'minute');
     return React.createElement(Card,{key:cut,size:'small',className:'kbq-panel',
-      title:`${cut} 切割队列`,
+      title:`${cut} 切割机任务`,
       extra:React.createElement(Space,{size:7},
-        React.createElement(Tag,{color:'blue',style:{margin:0}},`${list.length} 根`),
+        React.createElement(Tag,{color:'blue',style:{margin:0}},`${groups.length} 组 / ${list.length} 项`),
         React.createElement(Switch,{size:'small',checked:cutEnabled[cut],checkedChildren:'可用',unCheckedChildren:'禁用',onChange:v=>requestAvailabilityChange('cut',cut,v,cutEnabled,setCutEnabled)})
       )},
       React.createElement('div',{className:'kbq-lane-time',style:{padding:'7px 9px',borderBottom:'1px solid #f0f0f0'}},
         React.createElement('span',null,`预计全部完成 ${finishAt.format('HH:mm')}`)
       ),
-      React.createElement('div',{className:'kbq-cut-list'},list.length?list.map(task=>{
-        const running=processingTasks.some(t=>t.id===task.id), waiting=task.status==='未叫料'||task.status==='已叫料', selected=selectedRowKeys.includes(task.id), prog=progressInfo(task);
-        return React.createElement(Tooltip,{key:task.id,title:tip(task,cutMinutes(task))},
+      React.createElement('div',{className:'kbq-cut-list'},groups.length?groups.map((group,groupIndex)=>{
+        const task=group.tasks[0];
+        const orderedEntries=orderProfileEntries(group);
+        // 同一切割机上的型材组共享一条连续流水线：组 1 的全部型材排在组 2 之前。
+        // 前六根型材依次占用 分拣 / 切割 / 去底漆 / 喷码 / 出库 / 叫料 六个唯一工位，余下型材排队。
+        const profileOffset=groups.slice(0,groupIndex).reduce((total,item)=>total+item.profileEntries.length,0);
+        const profileStatuses=orderedEntries.map((_,profileIndex)=>KB_CUT_PIPELINE_SLOTS[profileOffset+profileIndex] || '排队中');
+        const running=profileStatuses.some(status=>status!=='排队中');
+        const waiting=!running;
+        const selected=group.tasks.some(t=>selectedRowKeys.includes(t.id)) || cutGroupDetail?.id===group.id;
+        const preview=orderedEntries.slice(0,3);
+        return React.createElement(Tooltip,{key:group.id,title:null},
           React.createElement('div',{
-            className:'kbq-cut-item kbq-outlet-card'+(running?' is-running':'')+(waiting?' is-pending':'')+(selected?' is-selected':'')+(dragOverId===task.id?' is-dragover':''),
-            draggable:waiting,
-            onDragStart:()=>{if(waiting)cutDragId.current=task.id;},
-            onDragOver:e=>{if(waiting){e.preventDefault();setDragOverId(task.id);}},
-            onDragEnd:()=>{cutDragId.current=null;setDragOverId(null);},
-            onDrop:e=>{e.preventDefault();reorderWaiting(cutDragId.current,task.id,'cutStation',cut,setCutOrder);cutDragId.current=null;setDragOverId(null);},
-            onClick:()=>selectAndReveal(task)
+            className:'kbq-cut-item kbq-outlet-card kbq-group-card'+(running?' is-running':'')+(waiting?' is-pending':'')+(selected?' is-selected':'')+(dragOverId===group.id?' is-dragover':''),
+            onDragOver:e=>{if(waiting&&cutGroupDragId.current){e.preventDefault();setDragOverId(group.id);}},
+            onDragEnd:()=>{cutGroupDragId.current=null;setDragOverId(null);},
+            onDrop:e=>{e.preventDefault();reorderCutGroup(cut,cutGroupDragId.current,group.id);cutGroupDragId.current=null;setDragOverId(null);},
+            onClick:()=>openCutGroup({...group,profileEntries:orderedEntries},cut,groupIndex,profileStatuses)
           },
             React.createElement('div',{className:'kbq-cut-top'},
-              React.createElement('span',{className:'kbq-cut-id'},task.nestingLayoutNo),
-              waiting&&React.createElement('span',{className:'kbq-drag',title:'拖动调整切割顺序'},'⠿')
+              React.createElement('div',{style:{minWidth:0,display:'flex',alignItems:'center',gap:7}},
+                React.createElement(Checkbox,{checked:selectedGroupIds.includes(group.id),disabled:running,
+                  onClick:e=>e.stopPropagation(),onChange:e=>setSelectedGroupIds(prev=>e.target.checked?[...prev,group.id]:prev.filter(id=>id!==group.id))}),
+                waiting&&React.createElement('span',{className:'kbq-drag-dots kbq-group-drag',draggable:true,title:'拖动调整型材组顺序',
+                  onClick:e=>e.stopPropagation(),onDragStart:e=>{e.stopPropagation();cutGroupDragId.current=group.id;e.dataTransfer.effectAllowed='move';}}),
+                React.createElement('span',{className:'kbq-cut-id'},group.groupNo),
+                React.createElement('span',{className:'kbq-group-time'},`预计 ${group.minutes} 分钟`)
+              ),
+              null
             ),
-            React.createElement('div',{className:'kbq-card-status'},
-              React.createElement(Tag,{color:KB_STATUS_COLOR[task.status]||(task.status==='已叫料'?'purple':'default'),style:{margin:0}},kbDisplayStatus(task.status)),
+            React.createElement('div',{className:'kbq-card-status',style:{position:'absolute',right:16,top:11,margin:0}},
+              React.createElement(Button,{size:'small',danger:true,disabled:running,
+                title:running?'加工中的型材组不可撤回':'撤回该型材组',
+                onClick:e=>{e.stopPropagation();onRecallGroup?.(group);}},'撤回')
             ),
-            React.createElement('div',{className:'kbq-cut-meta'},`${task.profileType} · ${task.length} mm · ${task.packageNo}`)
+            React.createElement('div',{className:'kbq-cut-meta'},`${group.profileCount} 根型材 · ${group.partsQty} 件 · ${group.packageNo}`),
+            React.createElement('div',{className:'kbq-group-summary'},
+              React.createElement('div',{className:'kbq-group-summary-head'},
+                React.createElement('span',null,'组内型材')
+              ),
+              React.createElement('div',{className:'kbq-profile-chips'},
+                ...preview.map(({profile},index)=>{
+                  const profileStatus=profileStatuses[index];
+                  return React.createElement('span',{key:(profile.profileId||index),className:'kbq-profile-chip',
+                    title:'查看型材详情',onClick:e=>{e.stopPropagation();onViewProfile?.(task,profile);}},`${profile.profileId||'未编码'} · ${kbDisplayStatus(profileStatus)}`);
+                }),
+                group.profiles.length>preview.length&&React.createElement('span',{className:'kbq-profile-chip'},`+${group.profiles.length-preview.length} 根`)
+              ),
+              group.tasks.length>1&&React.createElement('div',{className:'kbq-group-tasks'},`聚合 ${group.tasks.length} 个加工任务`)
+            )
           )
         );
       }):React.createElement('div',{className:'kbq-empty'},'暂无任务'))
     );
   }));
-  return React.createElement(Card,{className:'kbq-wrap',size:'small',title:'实时排产',
-    extra:React.createElement(Space,{size:8},
-      React.createElement(Tag,{color:'blue',style:{margin:0}},`未开始 ${pendingTasks.length} 根`),
-      React.createElement(Tag,{color:'purple',style:{margin:0}},`已叫料 ${calledTasks.length} 根`),
-      React.createElement(Tag,{color:'processing',style:{margin:0}},`加工中 ${processingTasks.length} 根`),
-      selectedRowKeys.length>0 && React.createElement(Tag,{color:'orange',closable:true,style:{margin:0},onClose:()=>onSelectTask(null,true)},`已选 ${selectedRowKeys.length} 根`)
-    )},
-    React.createElement(Tabs,{defaultActiveKey:'outlet',items:[
-      {key:'outlet',label:`出库队列 (${outletQueueTasks.length})`,children:outletContent},
-      {key:'spray',label:`喷码队列 (${sprayQueueTasks.length})`,children:sprayContent},
-      {key:'cut',label:`去底漆-切割 (${tasks.length})`,children:cutContent},
-    ]})
+  const groupDrawer = React.createElement(Drawer,{
+    title:cutGroupDetail ? `型材组详情 · ${cutGroupDetail.groupNo}` : '型材组详情',
+    open:!!cutGroupDetail, onClose:()=>setCutGroupDetail(null), width:390,
+  },cutGroupDetail && React.createElement(React.Fragment,null,
+    React.createElement(Text,{type:'secondary'},`${cutGroupDetail.cut} · 队列第 ${cutGroupDetail.queueIndex+1} 位`),
+    React.createElement(Descriptions,{size:'small',column:2,bordered:true,style:{marginTop:18},items:[
+      {key:'package',label:'来源工单',children:cutGroupDetail.packageNo||'-'},
+      {key:'time',label:'预计切割',children:`${cutGroupDetail.minutes} 分钟`},
+      {key:'profiles',label:'型材 / 零件',children:`${cutGroupDetail.profileCount} 根 / ${cutGroupDetail.partsQty} 件`},
+      {key:'outlet',label:'出库口',children:cutGroupDetail.profileEntries?.[0]?.task?.outlet||'-'},
+      {key:'spray',label:'喷码工位',children:cutGroupDetail.profileEntries?.[0]?.task?.sprayStation||'-'},
+      {key:'station',label:'切割工位',children:cutGroupDetail.cut},
+    ]}),
+    React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',margin:'20px 0 8px'}},
+      React.createElement('div',{style:{fontSize:13,fontWeight:600}},'组内型材（按顺序串行执行）'),
+      selectedProfileKeys.length>0&&React.createElement(Button,{size:'small',danger:true,onClick:()=>onRecallProfiles?.(cutGroupDetail,selectedProfileKeys)},`撤回已选 (${selectedProfileKeys.length})`)
+    ),
+    React.createElement('div',{style:{borderTop:'1px solid #f0f0f0'}},cutGroupDetail.profileEntries.map(({profile,task},index)=>{
+      const profileStatus=cutGroupDetail.profileStatuses?.[index] || '排队中';
+      const currentEntry={profile,task}, currentKey=entryKey(currentEntry,index), draggable=profileStatus==='排队中';
+      return (
+      React.createElement('div',{key:currentKey,draggable:false,
+        onDragStart:()=>{if(draggable)profileDragId.current=currentKey;},
+        onDragOver:e=>{if(draggable&&profileDragId.current){e.preventDefault();}},
+        onDragEnd:()=>{profileDragId.current=null;},
+        onDrop:e=>{e.preventDefault();if(draggable)reorderGroupProfile(cutGroupDetail,profileDragId.current,currentKey);profileDragId.current=null;},
+        style:{padding:'10px 2px',borderBottom:'1px solid #f0f0f0',display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,cursor:draggable?'grab':'default'}},
+        React.createElement('div',{style:{minWidth:0,display:'flex',alignItems:'center',gap:7}},
+          draggable&&React.createElement('span',{className:'kbq-drag-dots',draggable:true,title:'拖动调整组内顺序',
+            onDragStart:e=>{e.stopPropagation();profileDragId.current=currentKey;e.dataTransfer.effectAllowed='move';}}),
+          React.createElement(Checkbox,{checked:selectedProfileKeys.includes(currentKey),disabled:!draggable,
+            onChange:e=>setSelectedProfileKeys(prev=>e.target.checked?[...prev,currentKey]:prev.filter(key=>key!==currentKey))}),
+          React.createElement('div',{style:{minWidth:0}},
+          React.createElement('div',{style:{fontFamily:'Consolas,monospace',fontWeight:600,fontSize:12}},`${index+1}. ${profile.profileId||'未编码'}`),
+          React.createElement('div',null,
+            React.createElement(Text,{type:'secondary',style:{fontSize:12}},`${profile.profileType||task.profileType||'-'} · ${profile.length||task.length||0} mm`),
+            React.createElement(Tag,{color:KB_STATUS_COLOR[profileStatus]||'default',style:{marginLeft:6}},kbDisplayStatus(profileStatus))
+          )
+          )
+        ),
+        React.createElement(Space,{size:0},
+          React.createElement(Button,{size:'small',type:'link',onClick:()=>onViewProfile?.(task,profile)},'详情')
+        )
+      )
+      );
+    })),
+  ));
+  return React.createElement(React.Fragment,null,
+    React.createElement(Card,{className:'kbq-wrap kb-mode-card',size:'small',title:'切割队列',
+    extra:selectedGroupIds.length>0 && React.createElement(Button,{size:'small',danger:true,onClick:()=>onRecallGroup?.({
+        groupNo:`已选 ${selectedGroupIds.length} 个型材组`,tasks:tasks.filter(task=>selectedGroupIds.includes(task.profileGroupId||task.profileGroupNo||task.id))
+      })},`撤回已选 (${selectedGroupIds.length})`)},
+    cutContent
+    ),
+    groupDrawer
   );
 };
 
-const OutboundPage = () => {
+const OutboundPage = ({onRecallToSchedule}) => {
   const { message: msg } = App.useApp();
   const [items, setItems] = useState(makeKanbanItems);
+  // 加工任务提供两种独立工作视图：明细列表用于筛选和批量操作，队列用于现场实时排产。
+  const [taskView, setTaskView] = useState(()=>{
+    try { return localStorage.getItem('central-control:outbound-task-view') === 'queue' ? 'queue' : 'list'; }
+    catch (_) { return 'list'; }
+  });
   const [pickerId, setPickerId] = useState(null);
   const [pkgFilter, setPkgFilter] = useState();          // 工单号筛选
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);  // 多选
@@ -1437,25 +1647,34 @@ const OutboundPage = () => {
   const [detailOpen, setDetailOpen] = useState(false);   // 详情
   const [detailRow, setDetailRow] = useState(null);
   const [batchPickerOpen, setBatchPickerOpen] = useState(false);  // 批量改即将工位
-  const [activeTab, setActiveTab] = useState('pending');          // 当前 Tab
+  const [activeTab, setActiveTab] = useState('waitingOut');       // 当前 Tab
   const [sourceFilter, setSourceFilter] = useState();           // 来源筛选
   const [newOrderOpen, setNewOrderOpen] = useState(false);      // 手动创建工单
   const [newOrderKeys, setNewOrderKeys] = useState([]);        // 新建工单：所选工单
   const [newOrderPkgFilter, setNewOrderPkgFilter] = useState(''); // 新建工单：工单号筛选
   const [orderForm] = Form.useForm();
 
+  useEffect(()=>{
+    try { localStorage.setItem('central-control:outbound-task-view',taskView); }
+    catch (_) { /* 浏览器隐私模式下不可写时保持当前会话状态 */ }
+  },[taskView]);
+
   useEffect(() => {
     const receiveOrders = (ev) => {
       const orders = ev.detail || (ev.data && ev.data.type === 'central-control:add-processing-orders' ? ev.data.orders : []);
       if (!orders.length) return;
       setItems(prev => {
-        const existing = new Set(prev.map(x => x.packageNo));
-        const additions = orders.filter(p => p.packageNo && !existing.has(p.packageNo)).map((p, idx) => {
-          const reports = buildItemReports('OUT-PLAN', 'P'+randId(), '未指定', p.shipNo||'', p.blockNo||'', p.packageNo, '未叫料');
+        const existing = new Set(prev.map(x => x.profileGroupId || x.packageNo));
+        const groupOrders = orders.flatMap(p => (p.profileGroups?.length ? p.profileGroups.map(g=>({...p,...g})) : [p]));
+        const additions = groupOrders.filter(p => (p.profileGroupId || p.packageNo) && !existing.has(p.profileGroupId || p.packageNo)).map((p, idx) => {
+          const firstProfile=p.profiles?.[0]||{};
+          const reports = buildItemReports('OUT-PLAN', firstProfile.profileId||('P'+randId()), firstProfile.profileType||'未指定', p.shipNo||'', p.blockNo||'', p.packageNo, '未叫料');
           return {
             id:'MAT-PLAN-'+String(Date.now()+idx), lane:1, taskNo:'OUT-PLAN-'+padZ(rnd(9999)+1,4),
-            profileId:'P'+randId(), profileType:'未指定', shipNo:p.shipNo||'', blockNo:p.blockNo||'', packageNo:p.packageNo,
-            nestingLayoutNo:'-', programNo:'-', material:'-', length:0, source:'CREATE',
+            profileGroupId:p.profileGroupId||p.packageNo, profileGroupNo:p.profileGroupNo||p.packageNo, profileGroupName:p.profileGroupName||'默认型材组',
+            profileCount:p.profileCount||1, partsQty:p.partsQty||0, cutTime:p.cutTime||0, profiles:p.profiles||[],
+            profileId:firstProfile.profileId||'P'+randId(), profileType:firstProfile.profileType||'未指定', shipNo:p.shipNo||'', blockNo:p.blockNo||'', packageNo:p.packageNo,
+            profileGroups:[p], nestingLayoutNo:firstProfile.nestingLayoutNo||'-', programNo:firstProfile.programNo||'-', material:firstProfile.material||'-', length:firstProfile.length||0, source:'CREATE',
             outboundPort:'出库口1', createTime:new Date().toLocaleString('zh-CN'), finishTime:'',
             matReports:reports.matReports, partReports:reports.partReports, parts:[], status:'未叫料',
             pushLib:'未推送', pushSpray:'未推送', pushCut:'未推送', outlet:'出库口1', sprayStation:'喷码工位1', cutStation:'切割机1',
@@ -1464,10 +1683,15 @@ const OutboundPage = () => {
         });
         return [...additions, ...prev];
       });
-      msg.success(`已添加 ${orders.length} 个计划工单，进入未开始列表`);
+      msg.success(`已添加 ${orders.length} 个计划工单，状态为待出库`);
     };
     window.addEventListener('message', receiveOrders);
     window.addEventListener('central-control:add-processing-orders', receiveOrders);
+    if (window.__PENDING_PROCESSING_ORDERS?.length) {
+      const queued=window.__PENDING_PROCESSING_ORDERS;
+      window.__PENDING_PROCESSING_ORDERS=[];
+      receiveOrders({detail:queued});
+    }
     return () => { window.removeEventListener('message', receiveOrders); window.removeEventListener('central-control:add-processing-orders', receiveOrders); };
   }, [msg]);
 
@@ -1489,7 +1713,11 @@ const OutboundPage = () => {
         const idx = cfg.statuses.indexOf(target.status);
         if (idx >= 0 && idx < cfg.statuses.length - 1) {
           const ns = cfg.statuses[idx + 1];
-          return prev.map(i => i.id === target.id ? { ...i, status: ns } : i);
+          return prev.map(i => i.id === target.id ? {
+            ...i, status: ns,
+            // 实时工序推进只作用于当前队首型材，不能把一个组内多根型材同时推进到同一工序。
+            profiles:(i.profiles||[]).map((profile,index)=>index===0 ? {...profile,status:ns} : {...profile,status:'排队中'}),
+          } : i);
         }
         return prev;
       });
@@ -1617,6 +1845,9 @@ const OutboundPage = () => {
         id:'MAT-'+String(900+base+idx+1).padStart(3,'0'), lane:1, taskNo:'OUT-LOCAL-'+padZ(rnd(9999)+1,4),
         profileId:'P'+(p._profileId!=null?String(p._profileId).padStart(5,'0'):randId()),
         profileType:p.profileType, shipNo:p.shipNo, blockNo:p.blockNo, packageNo:p.packageNo,
+        profileGroupId:`PG-${p.packageNo}-${padZ(base+idx+1,2)}`,
+        profileGroupNo:`${p.packageNo}-G${padZ(base+idx+1,2)}`,
+        profileGroupName:`${p.packageNo} 型材组`,
         nestingLayoutNo:p.nestingLayoutNo, programNo:p.programNo, material:p.material, length:p.length, source:'LOCAL',
         outboundPort:Math.random()>0.5?'出库口1':'出库口2', createTime:new Date().toLocaleString('zh-CN'), finishTime:'',
         matReports:reports.matReports, partReports:reports.partReports, parts,
@@ -1632,13 +1863,70 @@ const OutboundPage = () => {
   });
 
   const doRecall = (item) => {
+    if (item.status === '未叫料') {
+      Modal.confirm({
+        title:'撤回加工任务', content:`确认撤回任务 ${item.taskNo}？撤回后将回到排产任务，并跳转至“预排产”页面。`,
+        okText:'确认撤回', cancelText:'取消',
+        onOk:()=>{
+          setItems(prev=>prev.filter(it=>it.id!==item.id));
+          onRecallToSchedule?.(item);
+          msg.success(`${item.id} 已撤回至排产任务`);
+        },
+      });
+      return;
+    }
     if (Math.random() < 0.75) {
       const keep = (v) => v === '无需推送' ? '无需推送' : '未推送';
       patch(item.id, { status: '未叫料', pushLib:keep(item.pushLib), pushSpray:keep(item.pushSpray), pushCut:keep(item.pushCut) });
-      msg.success(`${item.id} 叫料已撤回（推送状态重置为未推送）`);
+      msg.success(`${item.id} 已撤回至待出库（推送状态重置为未推送）`);
     } else {
       msg.warning(`${item.id} 无法撤回，已开始出库`);
     }
+  };
+  const recallGroup = (group) => {
+    const groupItems=(group.tasks||[]).map(task=>items.find(item=>item.id===task.id)).filter(Boolean);
+    if (!groupItems.length) return;
+    Modal.confirm({
+      title:'撤回型材组', content:`确认撤回型材组 ${group.groupNo} 的 ${groupItems.length} 个加工任务？`,
+      okText:'确认撤回', cancelText:'取消',
+      onOk:()=>{
+        setItems(prev=>prev.filter(item=>!groupItems.some(target=>target.id===item.id)));
+        groupItems.forEach(item=>onRecallToSchedule?.(item));
+        msg.success(`型材组 ${group.groupNo} 已撤回至排产任务`);
+      }
+    });
+  };
+  const recallProfiles = (group, profileKeys) => {
+    const chosen=(group.profileEntries||[]).filter(({profile,task},index)=>
+      profileKeys.includes(`${task.id}::${profile.profileId||profile.key||index}`)
+    );
+    if (!chosen.length) return;
+    Modal.confirm({
+      title:'撤回型材', content:`确认撤回已选 ${chosen.length} 根型材？`, okText:'确认撤回', cancelText:'取消',
+      onOk:()=>{
+        const idsByTask=new Map();
+        chosen.forEach(({profile,task})=>{
+          if (!idsByTask.has(task.id)) idsByTask.set(task.id,new Set());
+          idsByTask.get(task.id).add(profile.profileId||profile.key);
+        });
+        setItems(prev=>prev.flatMap(item=>{
+          const selected=idsByTask.get(item.id);
+          if (!selected) return [item];
+          const profiles=(item.profiles||[]).filter(profile=>!selected.has(profile.profileId||profile.key));
+          return profiles.length ? [{...item,profiles,profileCount:profiles.length,partsQty:profiles.reduce((sum,profile)=>sum+(Number(profile.partsQty)||0),0)}] : [];
+        }));
+        setDetailOpen(false);
+        msg.success(`已撤回 ${chosen.length} 根型材`);
+      }
+    });
+  };
+  const recallStationTasks = (kind, station) => {
+    const field=kind==='outlet'?'outlet':(kind==='spray'?'sprayStation':'cutStation');
+    const recalled=items.filter(item=>item[field]===station&&['未叫料','已叫料','待出库'].includes(item.status));
+    if (!recalled.length) { msg.info(`${station} 没有可撤回的待处理型材组`); return; }
+    setItems(prev=>prev.filter(item=>!recalled.some(target=>target.id===item.id)));
+    recalled.forEach(item=>onRecallToSchedule?.(item,{stayOnPage:true}));
+    msg.success(`${station} 已禁用，${recalled.length} 个型材组已撤回至排产任务`);
   };
   const doDispatch = (item) => {
     pushSettle(item.id);
@@ -1675,7 +1963,11 @@ const OutboundPage = () => {
   const doBatchChangeNext = (field, station) => {
     const meta = KB_STATION_FIELDS[field];
     const di = KB_STATION_MAP[field].di, pk = KB_STATION_MAP[field].pk, pkLabel = KB_STATION_MAP[field].label;
-    const targets = items.filter(i => selectedRowKeys.includes(i.id) && i.status !== '分拣完成');
+    const selectedGroups = new Set(items.filter(i=>selectedRowKeys.includes(i.id)).map(profileGroupKey));
+    // 切割机是型材组级排产资源：选择组内任一任务时，同组未完成任务一起调整。
+    const targets = items.filter(i => i.status !== '分拣完成' && (
+      field === 'cut' ? selectedGroups.has(profileGroupKey(i)) : selectedRowKeys.includes(i.id)
+    ));
     if (!targets.length) { msg.info('未选择可修改的工单'); return; }
     const applyBatch = () => {
       patchMany(targets.map(t => t.id), { [di]: station });
@@ -1683,7 +1975,8 @@ const OutboundPage = () => {
         if (t.status === '未叫料') { if (t[pk] !== '无需推送') patch(t.id, { [pk]: '未推送' }); }
         else { repushTarget(t, pk, pkLabel); }
       });
-      msg.success(`已批量修改 ${targets.length} 项 ${meta.label} → ${station}`);
+      const unitText = field === 'cut' ? `${new Set(targets.map(profileGroupKey)).size} 个型材组 / ${targets.length} 项` : `${targets.length} 项`;
+      msg.success(`已批量修改 ${unitText} ${meta.label} → ${station}`);
       setBatchPickerOpen(false);
     };
     if (targets.some(t => t.status !== '未叫料')) {
@@ -1695,39 +1988,16 @@ const OutboundPage = () => {
     } else { applyBatch(); }
   };
 
-  // ── 工位单元格（出库口 / 切割工位，均为先前定下、可修改）──
+  // ── 工位单元格（由排产指定，只读展示）──
   const renderStation = (item, field) => {
     const meta = KB_STATION_FIELDS[field];
     const di = KB_STATION_MAP[field].di;
     const cur = item[di];
-    const locked = item.status !== '未叫料';   // 一经下发即锁定
-    if (locked) {
-      // 已下发：列表内只读展示，修改请进「详情」
-      return React.createElement('span', {
-        className:'kb-badge',
-        style:{ borderColor:'#fb923c', background:'#fff7ed', color:'#c2410c', cursor:'default' },
-        title:`${meta.label}已锁定，修改请在「详情」中操作`,
-      }, '🔒 '+cur);
-    }
-    const key = item.id + ':' + field;
-    const content = React.createElement('div', { style:{maxWidth:220} },
-      React.createElement('div', { style:{fontSize:11,color:'#9ca3af',marginBottom:8} }, `选择${meta.label}`),
-      React.createElement(Space, { wrap:true, size:6 },
-        meta.pool.map(s => React.createElement(Button, {
-          key:s, size:'small', type: s === cur ? 'primary' : 'default',
-          onClick: () => doChange(item, field, s),
-        }, s))
-      )
-    );
-    return React.createElement(Popover, {
-      content, trigger:'click', placement:'bottomLeft',
-      open: pickerId === key, onOpenChange: (o) => setPickerId(o ? key : null),
-    },
-      React.createElement('span', {
-        className:'kb-badge kb-badge-editable',
-        title: `点击修改${meta.label}`,
-      }, cur)
-    );
+    return React.createElement('span', {
+      className:'kb-badge',
+      style:{ borderColor:'#fb923c', background:'#fff7ed', color:'#c2410c', cursor:'default' },
+      title:`${meta.label}由排产指定，不可修改`,
+    }, '🔒 '+cur);
   };
 
   // ── 操作列 ──
@@ -1739,8 +2009,8 @@ const OutboundPage = () => {
     });
   };
   const renderAction = (item) => {
-    const els = [ React.createElement(Button, { key:'d', size:'small', type:'link',
-      onClick:()=>{ setDetailRow(item); setDetailOpen(true); } }, '详情') ];
+    const els = [ React.createElement(Button, { key:'recall', size:'small', type:'link', disabled:item.status!=='未叫料',
+        onClick:()=>doRecall(item) }, '撤回') ];
     if (item.status === '未叫料') {
       const pushing = item.pushLib==='推送中'||item.pushSpray==='推送中'||item.pushCut==='推送中';
       const anyFail = item.pushLib==='失败'||item.pushSpray==='失败'||item.pushCut==='失败';
@@ -1751,11 +2021,25 @@ const OutboundPage = () => {
       } else {
       }
       els.push(React.createElement(Button, { key:'del', size:'small', type:'link', danger:true, onClick:()=>doDelete(item) }, '删除'));
-    } else {
-      if (item.status === '已叫料')
-        els.push(React.createElement(Button, { key:'rc0', size:'small', type:'link', onClick:()=>doRecall(item) }, '撤回'));
     }
     return React.createElement(Space, { size:0, wrap:true }, els);
+  };
+  const openProfileDetail = (group, profile) => {
+    const profileIndex=Math.max(0,(group.profiles||[]).findIndex(item=>item===profile || (item.profileId&&item.profileId===profile.profileId)));
+    setDetailRow({
+      ...group, ...profile,
+      id:profile.profileId || group.id,
+      profileId:profile.profileId || group.profileId,
+      profileType:profile.profileType || group.profileType,
+      length:profile.length || group.length,
+      nestingLayoutNo:profile.nestingLayoutNo || group.nestingLayoutNo,
+      partsQty:profile.partsQty ?? group.partsQty,
+      profileCount:1,
+      profiles:[profile],
+      status:kbProfileStatus(profile, group.status, profileIndex),
+      isProfileDetail:true,
+    });
+    setDetailOpen(true);
   };
 
   // ── 加工进度：5 步 mini 进度图（出库→喷码→去底漆→切割→分拣）──
@@ -1771,7 +2055,7 @@ const OutboundPage = () => {
     let label;
     if (done >= total)      label = '已完成';
     else if (active >= 0)   label = `${KB_PROG_STEPS[active]}中`;
-    else if (done === 0)    label = '未开始 · 待出库';
+    else if (done === 0)    label = '待出库';
     else                    label = `待${KB_PROG_STEPS[done]}`;
     return React.createElement('div', { className:'kb-prog' },
       React.createElement('div', { className:'kb-prog-bar' }, segs),
@@ -1780,9 +2064,12 @@ const OutboundPage = () => {
   };
 
   const cols = [
-    { title:'套料版图号', dataIndex:'nestingLayoutNo', width:120, fixed:'left',
+    { title:'套料版图号', dataIndex:'nestingLayoutNo', width:165, fixed:'left',
       render:v => React.createElement('span', { className:'kb-mat-id' }, v) },
-    { title:'工单号', dataIndex:'packageNo', width:100 },
+    { title:'型材编码', dataIndex:'profileId', width:145 },
+    { title:'来源型材组', dataIndex:'sourceProfileGroup', width:150,
+      render:v=>React.createElement('span',{className:'kb-mat-id'},v) },
+    { title:'来源工单', dataIndex:'sourceOrder', width:110 },
     { title:'来源', dataIndex:'source', width:100, render:v=>React.createElement(Tag,{color:KB_SOURCES[v]?.color},KB_SOURCES[v]?.label||v) },
     { title:'船号', dataIndex:'shipNo', width:90 },
     { title:'分段号', dataIndex:'blockNo', width:90 },
@@ -1790,8 +2077,10 @@ const OutboundPage = () => {
     { title:'型材规格', dataIndex:'profileType', width:140 },
     { title:'材质', dataIndex:'material', width:85 },
     { title:'长度', dataIndex:'length', width:90, render:v => `${v} mm` },
+    { title:'零件数', dataIndex:'partsQty', width:80 },
+    { title:'预估切割时间(s)', dataIndex:'cutTime', width:130 },
     { title:'当前状态', dataIndex:'status', width:110,
-      render:v => React.createElement(Tag, { color:KB_STATUS_COLOR[v]||'default', style:{margin:0} }, v==='未叫料'?'未开始':v) },
+      render:v => React.createElement(Tag, { color:KB_STATUS_COLOR[v]||'default', style:{margin:0} }, kbDisplayStatus(v)) },
     { title:'加工进度', key:'prog', width:185, render:(_,item)=>renderProgress(item) },
     { title:'出库口', key:'outlet', width:120, render:(_,item)=>renderStation(item,'outlet') },
     { title:'喷码工位', key:'spray', width:120, render:(_,item)=>renderStation(item,'spray') },
@@ -1799,7 +2088,7 @@ const OutboundPage = () => {
     { title:'推送立库', dataIndex:'pushLib', width:90, render:v=>React.createElement(Tag,{color:KB_PUSH_COLOR[v]||'default',style:{margin:0}}, v||'-') },
     { title:'推送喷码', dataIndex:'pushSpray', width:90, render:v=>React.createElement(Tag,{color:KB_PUSH_COLOR[v]||'default',style:{margin:0}}, v||'-') },
     { title:'推送切割', dataIndex:'pushCut', width:90, render:v=>React.createElement(Tag,{color:KB_PUSH_COLOR[v]||'default',style:{margin:0}}, v||'-') },
-    { title:'操作', key:'op', width:210, fixed:'right', render:(_,item)=>renderAction(item) },
+    { title:'操作', key:'op', width:210, fixed:'right', render:(_,item)=>renderAction(item.__parent||item) },
   ];
   const histCols = [
     ...cols.slice(0, -1),
@@ -1823,12 +2112,22 @@ const OutboundPage = () => {
     (!pkgFilter || i.packageNo === pkgFilter) &&
     (!sourceFilter || i.source === sourceFilter));
   const kbRealtimeQueueAll = items.filter(i => i.status !== '分拣完成');
-  const kbPend = filtered.filter(i => i.status === '未叫料');
-  const kbWaitingOut = filtered.filter(i => i.status === '待出库' || i.status === '已叫料')
-    .sort((a,b) => (a.status==='待出库'?0:1) - (b.status==='待出库'?0:1));
+  const kbWaitingOut = filtered.filter(i => i.status === '未叫料' || i.status === '已叫料')
+    .sort((a,b) => (a.status==='未叫料'?0:1) - (b.status==='未叫料'?0:1));
   const kbCalled = filtered.filter(i => i.status === '已叫料');
-  const kbProcessing = filtered.filter(i => !['未叫料','待出库','已叫料','分拣完成'].includes(i.status));
+  const kbProcessing = filtered.filter(i => !['未叫料','已叫料','分拣完成'].includes(i.status));
   const kbHist = filtered.filter(i => i.status === '分拣完成');
+  // 列表视图以单根型材为任务单元；型材组和工单仅作为来源追溯字段。
+  const toProfileRows = (taskList) => taskList.flatMap(task => (task.profiles||[task]).map((profile,index)=>({
+    ...task, ...profile,
+    id:`${task.id}::${profile.profileId||profile.key||index}`,
+    profileRowId:`${task.id}::${profile.profileId||profile.key||index}`,
+    __parent:task,
+    sourceProfileGroup:task.profileGroupNo||task.profileGroupId||'-',
+    sourceOrder:task.packageNo||'-',
+    status:kbProfileStatus(profile,task.status,index),
+    profileCount:1,
+  })));
 
   const batchNextContent = React.createElement('div', { style:{ maxWidth:248 } },
     React.createElement('div', { style:{fontSize:11,color:'#9ca3af',marginBottom:6} }, '统一设置所选物料的工位'),
@@ -1874,12 +2173,6 @@ const OutboundPage = () => {
       activeTab==='pending' && React.createElement(Button, { size:'small', type:'primary', onClick:startProduction, disabled:productionRunning }, '开始下发'),
       activeTab==='pending' && React.createElement(Button, { size:'small', danger:true, onClick:pauseProduction, disabled:!productionRunning }, '暂停下发'),
       selectedRowKeys.length > 0 && React.createElement(Text, { type:'secondary', style:{ fontSize:12 } }, `已选 ${selectedRowKeys.length} 项`),
-      selectedRowKeys.length > 0 && React.createElement(Popover, {
-        content: batchNextContent, trigger:'click', placement:'bottomRight',
-        open: batchPickerOpen, onOpenChange: setBatchPickerOpen,
-      },
-        React.createElement(Button, { size:'small', type:'primary', ghost:true }, '批量修改工位')
-      ),
       selectedRowKeys.length > 0 && React.createElement(Button, { size:'small', onClick:doBatchRecall }, '批量撤回'),
       selectedRowKeys.length > 0 && React.createElement(Button, { size:'small', type:'link', onClick:()=>setSelectedRowKeys([]) }, '清空')
     );
@@ -1904,7 +2197,7 @@ const OutboundPage = () => {
   ];
 
   const detailModal = React.createElement(Modal, {
-    title: `加工任务详情 — ${detailRow?.taskNo || ''}`,
+    title: detailRow?.isProfileDetail ? `型材详情 — ${detailRow?.profileId || ''}` : `加工任务详情 — ${detailRow?.taskNo || ''}`,
     open: detailOpen, footer: null, width: 780, key: detailRow?.id,
     onCancel: () => setDetailOpen(false),
   },
@@ -1957,17 +2250,11 @@ const OutboundPage = () => {
               React.createElement(Descriptions.Item, {label:'分段号'}, detailRow.blockNo),
               React.createElement(Descriptions.Item, {label:'出库通道'}, detailRow.outboundPort),
               React.createElement(Descriptions.Item, {label:'出库口'},
-                React.createElement(Select, { size:'small', value:detailRow.outlet, style:{width:96},
-                  options: KB_STATIONS.E.map(x=>({value:x,label:x})), disabled: detailRow.status==='分拣完成',
-                  onChange:(val)=>doChange(detailRow, 'outlet', val) })),
+                React.createElement(Tag,{color:'cyan'},detailRow.outlet)),
               React.createElement(Descriptions.Item, {label:'喷码工位'},
-                React.createElement(Select, { size:'small', value:detailRow.sprayStation, style:{width:96},
-                  options: KB_STATIONS.P.map(x=>({value:x,label:x})), disabled: detailRow.status==='分拣完成',
-                  onChange:(val)=>doChange(detailRow, 'spray', val) })),
+                React.createElement(Tag,{color:'blue'},detailRow.sprayStation)),
               React.createElement(Descriptions.Item, {label:'切割工位'},
-                React.createElement(Select, { size:'small', value:detailRow.cutStation, style:{width:96},
-                  options: KB_STATIONS.C.map(x=>({value:x,label:x})), disabled: detailRow.status==='分拣完成',
-                  onChange:(val)=>doChange(detailRow, 'cut', val) })),
+                React.createElement(Tag,{color:'purple'},detailRow.cutStation)),
               React.createElement(Descriptions.Item, {label:'来源'},
                 React.createElement(Tag,{color:detailRow.source==='RECEIVED'?'blue':'default'}, OUT_SOURCES[detailRow.source]||detailRow.source)),
               React.createElement(Descriptions.Item, {label:'加工状态'},
@@ -2048,7 +2335,9 @@ const OutboundPage = () => {
   const dragHandleCol = {
     title:'', key:'__drag', width:40, fixed:'left', align:'center',
     render:(_, record)=> React.createElement('span', {
-      className:'kb-drag-handle', draggable:true, title:'按住拖动调整下发顺序',
+      className:'kb-drag-handle', draggable:record.status==='未叫料',
+      title:record.status==='未叫料'?'按住拖动调整待出库顺序':'已叫料任务不可拖拽',
+      style:record.status==='未叫料'?undefined:{opacity:.35,cursor:'not-allowed'},
       onDragStart:(e)=>{ dragIdRef.current = record.id; e.dataTransfer.effectAllowed='move'; },
       onDragEnd:()=>{ dragIdRef.current=null; setDragOverId(null); },
     }, '⠿'),
@@ -2056,7 +2345,7 @@ const OutboundPage = () => {
   const kbTable = (data, sel, columns, drag) => React.createElement(Table, {
     className:'kb-table'+(drag?' kb-drag':''),
     columns: drag ? [dragHandleCol, ...(columns||cols)] : (columns||cols),
-    dataSource: data, rowKey:'id', size:'small',
+    dataSource: toProfileRows(data), rowKey:'profileRowId', size:'small',
     rowSelection: sel ? { selectedRowKeys, onChange:setSelectedRowKeys, preserveSelectedRowKeys:true } : undefined,
     // 固定列表可视区域，避免不同页签/数据量导致页面高度跳动
     scroll:{ x:1920, y:520 },
@@ -2072,35 +2361,45 @@ const OutboundPage = () => {
     pagination:{ pageSize:10, showSizeChanger:true, pageSizeOptions:['10','20','50'], showTotal:t=>`共 ${t} 条`, hideOnSinglePage:false },
     locale:{ emptyText:'暂无数据' },
   });
+  const viewSwitcher = React.createElement(Radio.Group, {
+    className:'kb-view-switch', value:taskView, onChange:e=>setTaskView(e.target.value), size:'small', buttonStyle:'solid',
+  },
+    React.createElement(Radio.Button,{value:'list'},'列表视图'),
+    React.createElement(Radio.Button,{value:'queue'},'队列视图')
+  );
   return React.createElement('div', { className:'page-content' },
-    React.createElement(Card, {
-      size:'small', title:'加工任务列表', extra: legend,
-    },
-      toolbar,
-      React.createElement(Tabs, { activeKey: activeTab, onChange:setActiveTab, tabBarExtraContent: batchOps, items:[
-        { key:'pending', label:`未开始 (${kbPend.length})`,
-          children: React.createElement('div', null,
-            kbTable(kbPend, true, pendingCols, false))
-            },
-        { key:'waitingOut', label:`待出库 (${kbWaitingOut.length})`,
-          children: kbTable(kbWaitingOut, true) },
-        { key:'processing', label:`加工中 (${kbProcessing.length})`,
-          children: kbTable(kbProcessing, true) },
-        { key:'history', label:`历史任务 (${kbHist.length})`,
-          children: kbTable(kbHist, false, histCols) },
-      ]})
+    React.createElement('div',{className:'kb-view-header'},
+      React.createElement('div',{className:'kb-view-title'},'加工任务'),
+      viewSwitcher
     ),
-    KB_QUEUE_GANTT_ENABLED && React.createElement(ProcessingQueueGantt, {
-      tasks:kbRealtimeQueueAll, selectedRowKeys,
-      onReorder:reorderPend,
-      onDisableAndReschedule:handleDisableAndReschedule,
-      onSelectTask:(task,clearAll=false)=>{
-        setPkgFilter(undefined); setSourceFilter(undefined);
-        if (clearAll) { setSelectedRowKeys([]); return; }
-        setSelectedRowKeys(prev=>prev.includes(task.id)?prev.filter(id=>id!==task.id):[...prev,task.id]);
-        setActiveTab(task.status==='未叫料'?'pending':(['待出库','已叫料'].includes(task.status)?'waitingOut':'processing'));
-      },
-    }),
+    taskView==='list'
+      ? React.createElement(Card, {
+          className:'kb-mode-card', size:'small', title:'任务列表', extra:legend,
+        },
+          toolbar,
+          React.createElement(Tabs, { activeKey: activeTab, onChange:setActiveTab, tabBarExtraContent: batchOps, items:[
+            { key:'waitingOut', label:`待出库 (${kbWaitingOut.length})`, children: kbTable(kbWaitingOut, true) },
+            { key:'processing', label:`加工中 (${kbProcessing.length})`, children: kbTable(kbProcessing, true) },
+            { key:'history', label:`历史任务 (${kbHist.length})`, children: kbTable(kbHist, false, histCols) },
+          ]})
+        )
+      : React.createElement(React.Fragment,null,
+          KB_QUEUE_GANTT_ENABLED && React.createElement(ProcessingQueueGantt, {
+            tasks:kbRealtimeQueueAll, selectedRowKeys,
+            onReorder:reorderPend,
+            onDisableAndReschedule:handleDisableAndReschedule,
+            onRecallGroup:recallGroup,
+            onRecallProfiles:recallProfiles,
+            onRecallStation:recallStationTasks,
+            onViewProfile:openProfileDetail,
+            onSelectTask:(task,clearAll=false)=>{
+              setPkgFilter(undefined); setSourceFilter(undefined);
+              if (clearAll) { setSelectedRowKeys([]); return; }
+              setSelectedRowKeys(prev=>prev.includes(task.id)?prev.filter(id=>id!==task.id):[...prev,task.id]);
+              setActiveTab(['未叫料','已叫料'].includes(task.status)?'waitingOut':'processing');
+            },
+          })
+        ),
     detailModal,
     React.createElement(Modal, {
       title:'新建工单（从工单列表选择）', open:newOrderOpen, okText:'创建并放入待下发', cancelText:'取消',
@@ -2171,10 +2470,27 @@ const makeSchedPackages = (n=12) => Array.from({length:n}, (_,i)=>{
   };
 });
 
-const SchedulePage = ({ targetDate } = {}) => {
-  const { message: msg } = App.useApp();
+const SchedulePage = ({ targetDate, dispatchConfirm, onConfirmDispatch, onCancelDispatch } = {}) => {
+  const { message: msg, modal } = App.useApp();
   const [pkgs, setPkgs] = useState(makeSchedPackages);
   const [pkgSel, setPkgSel] = useState([]);
+  const confirmDispatchWithMachineWarning = () => {
+    modal.confirm({
+      title:'更换切割机操作确认',
+      width:520,
+      content:React.createElement('div',null,
+        React.createElement(Alert,{type:'warning',showIcon:true,message:'检测到切割机分配已调整，请确认影响范围。',style:{marginBottom:14}}),
+        React.createElement(Descriptions,{column:1,size:'small',bordered:true},
+          React.createElement(Descriptions.Item,{label:'受影响型材'},React.createElement(Text,{strong:true,style:{color:'#fa8c16'}},'10 根')),
+          React.createElement(Descriptions.Item,{label:'预计移库操作'},React.createElement(Text,{strong:true,style:{color:'#fa8c16'}},'10 次')),
+          React.createElement(Descriptions.Item,{label:'需重新规划任务'},React.createElement(Text,{strong:true,style:{color:'#fa8c16'}},'10 项')),
+        ),
+        React.createElement('div',{style:{marginTop:12,color:'#8c8c8c',fontSize:12}},'确认后将按新的切割机分配继续下发。')
+      ),
+      okText:'仍然确认下发', cancelText:'返回检查',
+      onOk:()=>onConfirmDispatch?.(dispatchConfirm),
+    });
+  };
   const [drawerPkg, setDrawerPkg] = useState(null);
   const [shiftPickPkg, setShiftPickPkg] = useState(null);
   const [batchDate, setBatchDate] = useState(null);
@@ -2296,9 +2612,17 @@ const SchedulePage = ({ targetDate } = {}) => {
   // 仅排产甘特图·仿真（本地计算，无需后端）；tab1 暂保留不渲染
   void tab1;
   const iframeSrc = targetDate
-    ? `排产仿真_中控.html?date=${encodeURIComponent(targetDate)}&v=20260807`
-    : '排产仿真_中控.html?v=20260807';
+    ? `排产仿真_中控.html?date=${encodeURIComponent(targetDate)}`
+    : '排产仿真_中控.html';
   return React.createElement('div', { className:'page-content', style:{ padding:'8px' } },
+    dispatchConfirm && React.createElement(Card,{size:'small',style:{marginBottom:8},
+      title:'下发确认（可继续调整排产）',
+      extra:React.createElement(Space,null,
+        React.createElement(Button,{onClick:onCancelDispatch},'取消'),
+        React.createElement(Button,{type:'primary',onClick:confirmDispatchWithMachineWarning},'确认下发')
+      )
+    },React.createElement(Alert,{type:'info',showIcon:true,
+      message:`已选择 ${dispatchConfirm.orders.length} 个型材组/工单。可在下方排产操作页继续调整切割机、通路和顺序，确认下发后才会生成加工任务。`})),
     React.createElement('iframe', {
       key: iframeSrc,
       src: iframeSrc, title:'排产甘特图 · 排产仿真',
@@ -2312,6 +2636,15 @@ const SchedulePage = ({ targetDate } = {}) => {
 const SCHED_PLAN_STATUS = {
   READY:      { label:'待下发', color:'default' },
   DISPATCHED: { label:'已下发', color:'success' },
+};
+const SCHED_PLAN_SOURCE = {
+  CREATE: { label:'创建', color:'blue' },
+  REVOKE: { label:'撤回', color:'orange' },
+};
+const SCHED_PRODUCTION_STATUS = {
+  PENDING:    { label:'待生产', color:'default' },
+  PROCESSING: { label:'生产中', color:'processing' },
+  COMPLETED:  { label:'生产完成', color:'success' },
 };
 const SCHED_PLAN_DAO_LIST = ['H1','H2','H3','M1','M2','G1','R1','C1'];
 const makeSchedPlanList = (n=8) => {
@@ -2327,6 +2660,7 @@ const makeSchedPlanList = (n=8) => {
       const profCnt = rnd(6)+6;
       const shipNo = pick(SHIP_LIST);
       const blockNo = pick(BLOCK_LIST);
+      const packageNo = `PKG-${padZ(i+1,2)}${padZ(pi+1,2)}-${padZ(rnd(99)+1,2)}`;
       const machine = pick(usedMachines);
       const missingCount = Math.random()<0.42 ? rnd(3)+1 : 0;
       const stockReady = Math.max(0, profCnt - missingCount);
@@ -2341,17 +2675,45 @@ const makeSchedPlanList = (n=8) => {
         outlet: pick(['E1','E2']),
         partsQty: rnd(20)+3,
         cutTime: rnd(240)+60,
+        planningStatus: pick(['NOT_STARTED','PROCESSING','PROCESS_DONE_WAIT_PLAN','PLANNING','PLAN_DONE_WAIT_MIGRATE','MIGRATING','MIGRATED','MIGRATED']),
         stockStatus: pj < stockReady ? 'READY' : 'SHORTAGE',
+        profileGroupId: `PG-${padZ(i+1,3)}-${padZ(pi+1,2)}-${padZ(Math.floor(pj/3)+1,2)}`,
+        profileGroupNo: `型材组-${padZ(i+1,3)}-${padZ(pi+1,2)}-${padZ(Math.floor(pj/3)+1,2)}`,
+        profileGroupName: `${packageNo}-G${padZ(Math.floor(pj/3)+1,2)}`,
       }));
+      const profileGroups = Object.values(profiles.reduce((groups, profile) => {
+        const id = profile.profileGroupId;
+        if (!groups[id]) groups[id] = {
+          key:id, profileGroupId:id, profileGroupNo:profile.profileGroupNo, profileGroupName:profile.profileGroupName,
+          sourceOrderId:packageNo, sourceOrderNo:packageNo, shipNo, blockNo, machine,
+          groupOrder:Object.keys(groups).length+1, profileCount:0, partsQty:0, cutTime:0, stockReady:0,
+          scheduleStatus:'已排产', dispatchStatus:'未下发', processStatus:'待出库', activeStatus:'生效', profiles:[],
+        };
+        const group = groups[id];
+        group.profileCount += 1;
+        group.partsQty += profile.partsQty;
+        group.cutTime += profile.cutTime;
+        group.stockReady += profile.stockStatus==='READY' ? 1 : 0;
+        group.profiles.push(profile);
+        group.planProgress = {
+          done: group.profiles.filter(item=>item.planningStatus==='MIGRATED').length,
+          total: group.profiles.length,
+        };
+        return groups;
+      }, {}));
       return {
         key: `${i+1}-${pi+1}`,
-        packageNo: `PKG-${padZ(i+1,2)}${padZ(pi+1,2)}-${padZ(rnd(99)+1,2)}`,
+        packageNo,
         shipNo, blockNo, machine,
         profileCount: profCnt, stockReady,
+        taskDispatched: false,
+        profileGroups,
         profiles,
       };
     });
     const profileCount = packages.reduce((s,p)=>s+p.profileCount, 0);
+    const groupCount = packages.reduce((s,p)=>s+p.profileGroups.length, 0);
+    const partsQty = packages.reduce((s,p)=>s+p.profileGroups.reduce((n,g)=>n+g.partsQty,0),0);
     // 示例数据循环覆盖三种入库状态：未开始、未完成、已完成。
     const inboundStage = i % 3;
     const stockReady = inboundStage===0 ? 0 : (inboundStage===1 ? Math.max(1, profileCount-2) : profileCount);
@@ -2362,35 +2724,131 @@ const makeSchedPlanList = (n=8) => {
       pkg.profiles.forEach((profile, index) => {
         profile.stockStatus = index < pkg.stockReady ? 'READY' : 'SHORTAGE';
       });
+      pkg.profileGroups.forEach(group => {
+        group.stockReady = group.profiles.filter(profile=>profile.stockStatus==='READY').length;
+      });
     });
     const totalHours = +(profileCount*3.2/60).toFixed(1);
+    const historyPackages = packages.map(pkg => ({
+      ...pkg,
+      profileGroups: pkg.profileGroups.filter((group,index) => index === 0 || (index + i) % 3 !== 0),
+    }));
+    const historyGroups = historyPackages.flatMap(pkg=>pkg.profileGroups);
+    const historyProfileCount = historyGroups.reduce((sum,group)=>sum+group.profileCount,0);
+    const historyPartsQty = historyGroups.reduce((sum,group)=>sum+group.partsQty,0);
+    const historyStockReady = historyGroups.reduce((sum,group)=>sum+group.stockReady,0);
+    const historyGroupCount = historyGroups.length;
     return {
       key: i+1,
       schedNo: `SCH-${d.getFullYear()}${padZ(d.getMonth()+1,2)}${padZ(d.getDate(),2)}-${padZ(i+1,2)}`,
-      pkgCount, profileCount, stockReady, prodDate: ds,
+      pkgCount, groupCount, profileCount, partsQty, stockReady, prodDate: ds,
+      source: i % 4 === 3 ? 'REVOKE' : 'CREATE',
+      createdAt: `${ds} ${padZ(8+(i%6),2)}:${padZ(12+i*7,2)}:${padZ(10+i*3,2)}`,
+      planId:`PLAN-${d.getFullYear()}${padZ(d.getMonth()+1,2)}-${padZ(i+1,3)}`,
+      versionNo:'V2.0', versionStatus:'已确认',
       machines: usedMachines, shift: pick(shifts),
       totalHours,
       status: i < 3 ? 'DISPATCHED' : 'READY',
+      productionStatus: i===0 ? 'COMPLETED' : (i===1 ? 'PROCESSING' : 'PENDING'),
       dispatchTime: i < 3 ? `${ds} ${padZ(8+i,2)}:${padZ(20+i*7,2)}:${padZ(10+i*3,2)}` : '',
       packages,
+      versionHistory:[{
+        versionNo:'V1.0',
+        createdAt:`${ds} 07:${padZ(18+i*4,2)}:00`,
+        source:'CREATE',
+        groupCount:historyGroupCount,
+        profileCount:historyProfileCount,
+        partsQty:historyPartsQty,
+        stockReady:historyStockReady,
+        totalHours:+(historyProfileCount*3.2/60).toFixed(1),
+        packages:historyPackages,
+        machines:usedMachines,
+        prodDate:ds,
+        status:'READY',
+        shift:pick(shifts),
+      }],
     };
   });
 };
 
-const SchedPlanListPage = ({onNavigate}) => {
+const SchedPlanListPage = ({onNavigate, onOpenDispatchConfirm}) => {
   const { message: msg, modal } = App.useApp();
-  const [list, setList] = useState(makeSchedPlanList);
+  const [list, setList] = useState(()=>window.__SCHED_PLAN_LIST || makeSchedPlanList());
   const [detailRow, setDetailRow] = useState(null);
+  const [detailVersionNo, setDetailVersionNo] = useState('');
   const [editRow, setEditRow] = useState(null);
   const [editForm] = Form.useForm();
   const [prodDateFilter, setProdDateFilter] = useState('');
+  const [schedTab, setSchedTab] = useState('inbound');
   const [dispatchOpen, setDispatchOpen] = useState(false);
   const [dispatchTab, setDispatchTab] = useState('from-list');
   const [dispatchSelection, setDispatchSelection] = useState([]);
+  const [supplementSelection, setSupplementSelection] = useState([]);
   const [replanDate, setReplanDate] = useState('');
-  const filteredList = useMemo(() => prodDateFilter
+  const [planningQueueOpen, setPlanningQueueOpen] = useState(false);
+  const [queueTab, setQueueTab] = useState('active');
+  const [queueOrder, setQueueOrder] = useState();
+  const [queueMachine, setQueueMachine] = useState();
+  const [queueKeyword, setQueueKeyword] = useState('');
+  const [queueSearch, setQueueSearch] = useState('');
+  const [queueSelected, setQueueSelected] = useState([]);
+  const openDetail = (row) => {
+    setDetailVersionNo(row.versionNo);
+    setDetailRow(row);
+  };
+  const detailVersions = detailRow ? [
+    ...(detailRow.versionHistory || []),
+    {...detailRow, isCurrent:true},
+  ] : [];
+  const detailData = detailVersions.find(version=>version.versionNo===detailVersionNo)
+    || detailVersions[detailVersions.length-1];
+  const planningQueue = useMemo(()=>list.flatMap(plan=>plan.packages.flatMap(pkg=>pkg.profileGroups.flatMap(group=>group.profiles.map(profile=>({
+    ...profile, key:`${plan.key}-${profile.profileId}`, schedNo:plan.schedNo, sourceOrderNo:group.sourceOrderNo,
+    machine:group.machine, queueTime:plan.createdAt, planningStatus:profile.planningStatus||'NOT_STARTED',
+  }))))),[list]);
+  const queueEligible = item=>item.planningStatus!=='MIGRATED';
+  const queueRows = planningQueue.filter(item=>{
+    const isComplete=item.planningStatus==='MIGRATED';
+    return (queueTab==='completed' ? isComplete : !isComplete)
+      && (!queueOrder || item.sourceOrderNo===queueOrder)
+      && (!queueMachine || item.machine===queueMachine)
+      && (!queueSearch || String(item.nestingLayoutNo).toLowerCase().includes(queueSearch.toLowerCase()));
+  });
+  const queuePendingCount=planningQueue.filter(queueEligible).length;
+  const getPlanningStats = (profiles) => (profiles||[]).reduce((stats,profile)=>{
+    const status=normalizeProfilePlanningStatus(profile.planningStatus);
+    stats.total+=1;
+    if(status==='MIGRATED') stats.done+=1;
+    else if(status.includes('FAILED')) stats.failed+=1;
+    else if(status==='NOT_STARTED') stats.notStarted+=1;
+    else stats.processing+=1;
+    return stats;
+  },{total:0,notStarted:0,processing:0,done:0,failed:0});
+  const detailPlanStats=getPlanningStats(detailData?.packages?.flatMap(pkg=>pkg.profiles)||[]);
+  useEffect(()=>{ window.__SCHED_PLAN_LIST=list; },[list]);
+  const dateFilteredList = useMemo(() => prodDateFilter
     ? list.filter(item => item.prodDate === prodDateFilter)
     : list, [list, prodDateFilter]);
+  const filteredList = useMemo(() => dateFilteredList.filter(item =>
+    schedTab === 'inbound' ? item.status === 'READY' : item.status === 'DISPATCHED'
+  ), [dateFilteredList, schedTab]);
+  // 入库排产中的型材组均可查看；实际以下方已入库且未下发的型材为下发最小粒度。
+  const supplementPackages = useMemo(() => list.filter(item=>item.status==='READY').flatMap(item=>item.packages
+    .map(pkg=>{
+      const allProfiles=(pkg.profiles||[]).map(profile=>({...profile,dispatchKey:`${item.key}-${pkg.key}-${profile.key}`}));
+      const availableProfiles=allProfiles.filter(profile=>profile.stockStatus==='READY'&&!profile.taskDispatched);
+      return {...pkg,key:`${item.key}-${pkg.key}`,planKey:item.key,packageKey:pkg.key,schedNo:item.schedNo,prodDate:item.prodDate,
+        groupCount:pkg.profileGroups?.length||0,allProfiles,availableProfiles};
+    })), [list]);
+  const supplementGroups = useMemo(() => supplementPackages.flatMap(pkg=>pkg.profileGroups.map(group=>{
+    const profiles=(group.profiles||[]).map(profile=>pkg.allProfiles.find(item=>item.dispatchKey===`${pkg.planKey}-${pkg.packageKey}-${profile.key}`)).filter(Boolean);
+    const availableProfiles=profiles.filter(profile=>profile.stockStatus==='READY'&&!profile.taskDispatched);
+    return {...group,key:`${pkg.key}-${group.key}`,packageNo:pkg.packageNo,schedNo:pkg.schedNo,prodDate:pkg.prodDate,stockReady:group.stockReady,basePackage:pkg,profiles,availableProfiles};
+  })),[supplementPackages]);
+  const sendProcessingOrders = (plans) => {
+    const orders = plans.flatMap(plan => plan.packages || []);
+    if (orders.length) window.dispatchEvent(new CustomEvent('central-control:add-processing-orders',{detail:orders}));
+  };
 
   const dispatchRow = (r) => {
     modal.confirm({
@@ -2398,14 +2856,19 @@ const SchedPlanListPage = ({onNavigate}) => {
       content:`该排产包含 ${r.pkgCount} 个切割包 / ${r.profileCount} 根型材，生产日期 ${r.prodDate}。下发后将进入加工任务。`,
       okText:'确认下发', cancelText:'取消',
       onOk:() => {
+        sendProcessingOrders([r]);
         setList(prev => prev.map(x => x.key===r.key
-          ? {...x, status:'DISPATCHED', dispatchTime:new Date().toLocaleString('zh-CN', {hour12:false})}
+          ? {...x, status:'DISPATCHED', productionStatus:'PENDING', dispatchTime:new Date().toLocaleString('zh-CN', {hour12:false})}
           : x));
         msg.success(`排产 ${r.schedNo} 已下发`);
       }
     });
   };
   const deleteRow = (r) => {
+    if (r.status === 'DISPATCHED' || Number(r.stockReady) > 0) {
+      msg.warning('仅入库状态为“未开始”的排产可删除');
+      return;
+    }
     modal.confirm({
       title:`删除排产 ${r.schedNo} ?`,
       content:'删除后无法恢复。',
@@ -2418,26 +2881,49 @@ const SchedPlanListPage = ({onNavigate}) => {
   };
   const openDispatch = () => {
     setDispatchSelection([]);
+    setSupplementSelection([]);
     setDispatchTab('from-list');
     setDispatchOpen(true);
   };
   const submitDispatch = () => {
     if (dispatchTab === 'from-list') {
       if (!dispatchSelection.length) { msg.warning('请先勾选待下发排产'); return; }
-      setList(prev => prev.map(item => dispatchSelection.includes(item.key) ? {...item,status:'DISPATCHED'} : item));
-      msg.success(`已下发 ${dispatchSelection.length} 条排产至加工任务`);
+      const plans=list.filter(item=>dispatchSelection.includes(item.key));
+      onOpenDispatchConfirm?.({mode:'full',planKeys:plans.map(p=>p.key),orders:plans.flatMap(p=>p.packages||[])});
       setDispatchOpen(false);
       return;
     }
-    const next = makeSchedPlanList(1)[0];
-    const prodDate = replanDate || next.prodDate;
-    setList(prev => [{...next,key:`${Date.now()}-${next.key}`,schedNo:`${next.schedNo}-R`,prodDate,status:'READY'}, ...prev]);
-    msg.success(`已重新排产，生成生产日期为 ${prodDate} 的待下发排产`);
+    if (!supplementSelection.length) { msg.warning('请先勾选要下发的型材'); return; }
+    const selectedKeys=new Set(supplementSelection);
+    const supplementOrders=supplementGroups.flatMap(group=>group.availableProfiles
+      .filter(profile=>selectedKeys.has(profile.dispatchKey)).map(profile=>{
+        const profileGroup={...group,profileGroupId:`${group.profileGroupId}-${profile.dispatchKey}`,
+          profileCount:1,partsQty:profile.partsQty,cutTime:profile.cutTime,stockReady:1,profiles:[profile]};
+        return {...group.basePackage,profileCount:1,stockReady:1,profiles:[profile],profileGroups:[profileGroup]};
+      }));
+    onOpenDispatchConfirm?.({mode:'supplement',profileKeys:supplementSelection,orders:supplementOrders});
     setDispatchOpen(false);
   };
   const openEdit = (r) => {
-    if (r.status === 'DISPATCHED') return;
+    if (r.status === 'DISPATCHED' || Number(r.stockReady) > 0) {
+      msg.warning('仅入库状态为“未开始”的排产可编辑');
+      return;
+    }
     onNavigate?.('sched-list');
+  };
+  const issueOutbound = (r) => {
+    if (r.productionStatus === 'COMPLETED') { msg.info(`排产 ${r.schedNo} 已生产完成`); return; }
+    setList(prev => prev.map(item => item.key===r.key ? {...item,productionStatus:'PROCESSING'} : item));
+    if (detailRow?.key === r.key) setDetailRow(prev => ({...prev,productionStatus:'PROCESSING'}));
+    msg.success(`排产 ${r.schedNo} 已下发至出库任务`);
+  };
+  const showProductionStatus = (r) => {
+    const cfg = SCHED_PRODUCTION_STATUS[r.productionStatus] || SCHED_PRODUCTION_STATUS.PENDING;
+    modal.info({
+      title:`生产状态 — ${r.schedNo}`,
+      content:React.createElement(Tag,{color:cfg.color},cfg.label),
+      okText:'关闭',
+    });
   };
   const inboundStatusTag = (completed, total, schedStatus) => {
     if (schedStatus === 'DISPATCHED') return React.createElement(Tag,{color:'success',style:{margin:0}},'已完成');
@@ -2459,10 +2945,18 @@ const SchedPlanListPage = ({onNavigate}) => {
   const cols = [
     { title:'排产序号', dataIndex:'schedNo', width:180,
       render:v => React.createElement(Tag,{color:'blue',style:{fontWeight:600,fontSize:13}},v) },
-    { title:'工单数', dataIndex:'pkgCount', width:130, align:'center',
-      render:v => React.createElement(Tag,{color:'geekblue'},`${v} 个`) },
+    { title:'切割包数', dataIndex:'pkgCount', width:100, align:'center',render:v=>React.createElement(Tag,{color:'cyan',style:{margin:0}},`${v} 包`) },
+    { title:'来源', dataIndex:'source', width:90, align:'center',
+      render:v=>React.createElement(Tag,{color:SCHED_PLAN_SOURCE[v]?.color,style:{margin:0}},SCHED_PLAN_SOURCE[v]?.label||v) },
+    { title:'创建时间', dataIndex:'createdAt', width:175,
+      sorter:(a,b)=>(a.createdAt||'').localeCompare(b.createdAt||'') },
+    { title:'下发时间', dataIndex:'dispatchTime', key:'dispatchTime', width:175,
+      sorter:(a,b)=>(a.dispatchTime||'').localeCompare(b.dispatchTime||'') },
+    { title:'型材组数', dataIndex:'groupCount', width:100, align:'center',render:v=>React.createElement(Tag,{color:'cyan'},`${v} 组`) },
     { title:'型材总数', dataIndex:'profileCount', width:100, align:'center',
       render:v => React.createElement(Tag,{color:'purple'},`${v} 根`) },
+    { title:'工艺规划状态', key:'planningStatus', width:150,
+      render:(_,r)=>renderPlanProgress(calcPlanProgress(r.packages.flatMap(pkg=>pkg.profiles))) },
     { title:'入库状态', key:'stock', width:145,
       render:(_,r) => inboundStatusTag(r.stockReady, r.profileCount, r.status) },
     { title:'生产日期', dataIndex:'prodDate', width:130,
@@ -2470,25 +2964,35 @@ const SchedPlanListPage = ({onNavigate}) => {
     { title:'切割机', dataIndex:'machines', width:140,
       render:v=>React.createElement(Space,{size:3,wrap:true},v.map(machine=>React.createElement(Tag,{key:machine,color:'geekblue',style:{margin:0}},machine))) },
     { title:'预计工时', dataIndex:'totalHours', width:110, render:v=>`${v} h` },
-    { title:'状态', dataIndex:'status', width:100,
-      render:v=>React.createElement(Tag,{color:SCHED_PLAN_STATUS[v].color,style:{margin:0}},SCHED_PLAN_STATUS[v].label) },
+    { title:'下发情况', key:'dispatch', width:100,render:(_,r)=>React.createElement(Tag,{color:r.status==='DISPATCHED'?'success':'default',style:{margin:0}},r.status==='DISPATCHED'?'已下发':'未下发') },
+    { title:'加工情况', dataIndex:'productionStatus', key:'production', width:110,
+      render:(v,r)=>r.status==='READY' ? '-' : (()=>{ const cfg=SCHED_PRODUCTION_STATUS[v]||SCHED_PRODUCTION_STATUS.PENDING; return React.createElement(Tag,{color:cfg.color,style:{margin:0}},cfg.label); })() },
     { title:'操作', key:'op', width:240, fixed:'right',
-      render:(_,r) => React.createElement(Space,{size:2},
+      render:(_,r) => {
+        const editDisabled = r.status === 'DISPATCHED' || Number(r.stockReady) > 0;
+        const deleteDisabled = editDisabled;
+        const editButton = React.createElement(Tooltip,{title:editDisabled?'仅入库状态为“未开始”时可编辑':''},
+          React.createElement('span',null,
+            React.createElement(Button,{size:'small',type:'link',disabled:editDisabled,onClick:()=>openEdit(r)},'编辑')));
+        const deleteButton = React.createElement(Tooltip,{title:deleteDisabled?'仅入库状态为“未开始”时可删除':''},
+          React.createElement('span',null,
+            React.createElement(Button,{size:'small',type:'link',danger:true,disabled:deleteDisabled},'删除')));
+        return React.createElement(Space,{size:2},
         r.status === 'DISPATCHED'
-          ? React.createElement(Button,{size:'small',type:'link',onClick:()=>setDetailRow(r)},'详情')
+          ? React.createElement(React.Fragment,null,
+              React.createElement(Button,{size:'small',type:'link',onClick:()=>openDetail(r)},'排产详情'),
+              React.createElement(Popconfirm,{title:`撤回排产 ${r.schedNo} 的加工任务？`,okText:'撤回',cancelText:'取消',onConfirm:()=>msg.success(`已撤回 ${r.schedNo} 的加工任务；下发记录已保留`)},React.createElement(Button,{size:'small',type:'link',danger:true},'撤回'))
+            )
           : React.createElement(React.Fragment,null,
-        React.createElement(Button,{
-          size:'small', type:'primary',
-          onClick:()=>dispatchRow(r),
-        }, '下发'),
-        React.createElement(Button,{size:'small',type:'link',onClick:()=>setDetailRow(r)},'详情'),
-        React.createElement(Button,{size:'small',type:'link',onClick:()=>openEdit(r)},'编辑'),
-        React.createElement(Popconfirm,{
-          title:`删除排产 ${r.schedNo} ?`, okText:'删除', okButtonProps:{danger:true}, cancelText:'取消',
-          onConfirm:()=>deleteRow(r),
-        }, React.createElement(Button,{size:'small',type:'link',danger:true},'删除')),
-          ),
-      )
+              React.createElement(Button,{size:'small',type:'link',onClick:()=>openDetail(r)},'排产详情'),
+              editButton,
+              deleteDisabled ? deleteButton : React.createElement(Popconfirm,{
+                title:`删除排产 ${r.schedNo} ?`, okText:'删除', okButtonProps:{danger:true}, cancelText:'取消',
+                onConfirm:()=>deleteRow(r),
+              }, deleteButton)
+            )
+        );
+      }
     },
   ];
   const stats = {
@@ -2496,6 +3000,45 @@ const SchedPlanListPage = ({onNavigate}) => {
     dispatched: list.filter(x=>x.status==='DISPATCHED').length,
     ready: list.filter(x=>x.status==='READY').length,
     totalProfiles: list.reduce((s,x)=>s+x.profileCount,0),
+  };
+  const renderPlanGantt = (row) => {
+    const groups=row.packages.flatMap(pkg=>pkg.profileGroups).sort((a,b)=>a.groupOrder-b.groupOrder);
+    const machineGroups=Object.fromEntries(row.machines.map(machine=>[machine,groups.filter(g=>g.machine===machine)]));
+    const totals=Object.values(machineGroups).map(gs=>gs.reduce((sum,g)=>sum+g.cutTime,0));
+    const max=Math.max(...totals,1);
+    const rowH=30, headerH=30, labelW=50, width=1400, usableW=width-labelW-20;
+    const height=headerH+row.machines.length*rowH+20;
+    const fmtTime=seconds=>{const m=Math.round(seconds/60);return `${Math.floor(m/60)}h${String(m%60).padStart(2,'0')}m`;};
+    const groupNames=[...new Set(groups.map(g=>g.profileGroupName||g.profileGroupNo))];
+    // 使用黄金角分布生成不重复的色相：同一型材组在条形和图例中始终使用同一种颜色。
+    const colorByGroup=Object.fromEntries(groupNames.map((name,index)=>[
+      name, `hsl(${Math.round((index*137.508)%360)}, 68%, 44%)`
+    ]));
+    const svgChildren=[];
+    for(let i=0;i<=10;i++){
+      const x=labelW+usableW*i/10;
+      svgChildren.push(React.createElement('line',{key:`grid-${i}`,x1:x,y1:headerH,x2:x,y2:height-10,stroke:'#e8e8ed'}));
+      svgChildren.push(React.createElement('text',{key:`tick-${i}`,x,y:headerH-8,textAnchor:'middle',fontSize:11,fill:'#666'},fmtTime(max*i/10)));
+    }
+    row.machines.forEach((machine,mi)=>{
+      const y=headerH+mi*rowH;
+      svgChildren.push(React.createElement('text',{key:`label-${machine}`,x:10,y:y+rowH/2+4,fontSize:13,fontWeight:'bold'},machine));
+      svgChildren.push(React.createElement('line',{key:`row-${machine}`,x1:labelW,y1:y+rowH-2,x2:width-10,y2:y+rowH-2,stroke:'#e8e8ed'}));
+      let offset=0;
+      machineGroups[machine].forEach((g,index)=>{
+        const x=labelW+offset/max*usableW, w=Math.max(1,g.cutTime/max*usableW); offset+=g.cutTime;
+        svgChildren.push(React.createElement('rect',{key:g.key,x,y:y+4,width:w,height:rowH-10,fill:colorByGroup[g.profileGroupName||g.profileGroupNo],opacity:.85,style:{cursor:'pointer'}},
+          React.createElement('title',null,`${g.profileGroupNo}\n${g.profileCount} 根 / ${g.partsQty} 件\n[${fmtTime(offset-g.cutTime)} - ${fmtTime(offset)}]`)));
+      });
+    });
+    return React.createElement(Card,{size:'small',title:'排产甘特图',style:{marginBottom:16},bodyStyle:{padding:'10px 12px'}},
+      React.createElement('div',{style:{overflowX:'auto',border:'1px solid #f0f0f0',borderRadius:6,background:'#fafbfc',padding:4}},
+        React.createElement('svg',{viewBox:`0 0 ${width} ${height}`,width,height},svgChildren)
+      ),
+      React.createElement('div',{style:{display:'flex',gap:14,flexWrap:'wrap',fontSize:12,marginTop:12,padding:'8px 10px',background:'#f5f6fa',borderRadius:6}},
+        ...groupNames.map(name=>React.createElement('span',{key:name,style:{display:'inline-flex',alignItems:'center',gap:6}},React.createElement('i',{style:{width:12,height:12,borderRadius:3,background:colorByGroup[name],display:'inline-block'}}),name))
+      )
+    );
   };
 
   return React.createElement('div', {className:'page-content'},
@@ -2521,102 +3064,145 @@ const SchedPlanListPage = ({onNavigate}) => {
         React.createElement(Button,{disabled:!prodDateFilter,onClick:()=>setProdDateFilter('')},'重置'),
         prodDateFilter && React.createElement(Tag,{color:'blue',style:{margin:0}},`已筛选 ${filteredList.length} 条排产`),
         React.createElement('div',{style:{flex:1}}),
-        React.createElement(Button,{onClick:openDispatch},'下发至加工任务'),
-        React.createElement(Button,{type:'primary',ghost:true,onClick:()=>onNavigate?.('new-sched-plan')},'+ 新建排产')
+        React.createElement(Button,{
+          type:'primary',
+          ghost:true,
+          onClick:()=>{
+            // 此入口必须切换页面；不使用可选调用，避免回调遗漏时点击静默失效。
+            onNavigate('new-sched-plan');
+          },
+        },'+ 新建预排产'),
+        React.createElement(Badge,{count:queuePendingCount,offset:[-2,2]},React.createElement(Button,{onClick:()=>setPlanningQueueOpen(true)},'工艺规划队列')),
+        React.createElement(Button,{type:'primary',onClick:openDispatch},'下发至加工任务')
       )
     ),
 
     React.createElement(Card,{size:'small',title:'排产列表',
       extra: React.createElement(Space,{size:12},
         React.createElement(Text,{type:'secondary',style:{fontSize:12}},
-          prodDateFilter ? `共 ${filteredList.length} / ${list.length} 条排产` : `共 ${list.length} 条排产`)
+          prodDateFilter ? `共 ${filteredList.length} / ${dateFilteredList.length} 条排产` : `共 ${filteredList.length} 条排产`)
       )
     },
+      React.createElement(Tabs,{
+        activeKey:schedTab,
+        onChange:setSchedTab,
+        items:[
+          {key:'inbound',label:'预排产'},
+          {key:'dispatched',label:'下发记录'},
+        ],
+      }),
       React.createElement(Table,{
-        columns:cols, dataSource:filteredList, rowKey:'key', size:'small',
+        columns:cols.filter(col=>{
+          if (schedTab==='dispatched') return col.key!=='stock' && col.key!=='dispatch';
+          return col.key!=='dispatchTime' && col.key!=='dispatch' && col.key!=='production' && col.key!=='planningStatus';
+        }), dataSource:filteredList, rowKey:'key', size:'small',
         scroll:{x:1000}, pagination:{pageSize:10,showTotal:t=>`共 ${t} 条`},
         locale:{emptyText:'暂无排产'},
-        expandable:{
-          expandRowByClick:true,
-          expandedRowRender: row => React.createElement('div',{style:{padding:'4px 0'}},
-            React.createElement(Table,{
-              size:'small', dataSource:row.packages.map(pkg=>({...pkg,status:row.status})), rowKey:'key', pagination:false,
-              scroll:{x:760},
-              columns:[
-                {title:'工单号',dataIndex:'packageNo',width:180,
-                  render:v=>React.createElement(Tag,{color:'blue',style:{fontWeight:600,margin:0}},v)},
-                {title:'船号',dataIndex:'shipNo',width:110},
-                {title:'分段号',dataIndex:'blockNo',width:110},
-                {title:'切割机',dataIndex:'machine',width:100,
-                  render:v=>React.createElement(Tag,{color:'geekblue',style:{margin:0}},v)},
-                {title:'型材数',dataIndex:'profileCount',width:100,
-                  render:v=>React.createElement(Tag,{color:'purple',style:{margin:0}},`${v} 根`)},
-                {title:'状态',dataIndex:'status',width:100,
-                  render:v=>React.createElement(Tag,{color:SCHED_PLAN_STATUS[v].color,style:{margin:0}},SCHED_PLAN_STATUS[v].label)},
-              ],
-            })
-          )
-        }
       })
     ),
 
     React.createElement(Drawer,{
-      title: detailRow ? `排产详情 — ${detailRow.schedNo}` : '', width:920,
-      open:!!detailRow, onClose:()=>setDetailRow(null),
+      title: detailRow ? `排产详情 · ${detailRow.schedNo} · ${detailData?.versionNo||''}` : '排产详情', width:920,
+      open:!!detailRow, onClose:()=>{setDetailRow(null);setDetailVersionNo('');},
     },
       detailRow && React.createElement('div',null,
+        React.createElement(Card,{size:'small',title:'版本查看',style:{marginBottom:16}},
+          React.createElement('div',{style:{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}},
+            React.createElement(Text,{type:'secondary'},'查看版本'),
+            React.createElement(Select,{value:detailData?.versionNo,style:{width:210},onChange:setDetailVersionNo,
+              options:detailVersions.slice().reverse().map(version=>({
+                value:version.versionNo,
+                label:`${version.versionNo}${version.isCurrent?'（当前生效）':'（历史版本）'} · ${version.createdAt||'-'}`,
+              }))}),
+            React.createElement(Text,{type:'secondary',style:{fontSize:12}},'历史版本仅用于追溯，不支持修改或回退。')
+          )
+        ),
         React.createElement(Descriptions,{column:2,size:'small',bordered:true,style:{marginBottom:16}},
           React.createElement(Descriptions.Item,{label:'排产序号'},detailRow.schedNo),
           React.createElement(Descriptions.Item,{label:'状态'},
-            React.createElement(Tag,{color:SCHED_PLAN_STATUS[detailRow.status].color},
-              SCHED_PLAN_STATUS[detailRow.status].label)),
-          React.createElement(Descriptions.Item,{label:'生产日期'},detailRow.prodDate),
-          React.createElement(Descriptions.Item,{label:'切割包数量'},`${detailRow.pkgCount} 包`),
-          React.createElement(Descriptions.Item,{label:'型材数'},`${detailRow.profileCount} 根`),
+            React.createElement(Tag,{color:SCHED_PLAN_STATUS[detailData.status]?.color},
+              SCHED_PLAN_STATUS[detailData.status]?.label||detailData.status)),
+          React.createElement(Descriptions.Item,{label:'来源'},
+            React.createElement(Tag,{color:SCHED_PLAN_SOURCE[detailData.source]?.color},
+              SCHED_PLAN_SOURCE[detailData.source]?.label||detailData.source)),
+          React.createElement(Descriptions.Item,{label:'生产日期'},detailData.prodDate),
+          React.createElement(Descriptions.Item,{label:'型材组数'},`${detailData.groupCount} 组`),
+          React.createElement(Descriptions.Item,{label:'型材数'},`${detailData.profileCount} 根`),
+          React.createElement(Descriptions.Item,{label:'零件数'},`${detailData.partsQty} 件`),
           React.createElement(Descriptions.Item,{label:'入库状态'},
-            inboundStatusTag(detailRow.stockReady, detailRow.profileCount, detailRow.status)),
-          React.createElement(Descriptions.Item,{label:'预计工时'},`${detailRow.totalHours} h`),
-          React.createElement(Descriptions.Item,{label:'使用切割机'},detailRow.machines.join('、')),
-          React.createElement(Descriptions.Item,{label:'班次安排'},detailRow.shift),
+            inboundStatusTag(detailData.stockReady, detailData.profileCount, detailData.status)),
+          React.createElement(Descriptions.Item,{label:'预计工时'},`${detailData.totalHours} h`),
+          React.createElement(Descriptions.Item,{label:'使用切割机'},detailData.machines.join('、')),
         ),
+        React.createElement(Card,{size:'small',title:'规划状态统计',style:{marginBottom:16},bodyStyle:{padding:'10px 12px'}},
+          React.createElement(Row,{gutter:10},[
+            {label:'型材组数量',value:detailData.groupCount,color:'#722ed1'},
+            {label:'型材总数',value:detailPlanStats.total,color:'#1677ff'},
+            {label:'未开始',value:detailPlanStats.notStarted,color:'#8c8c8c'},
+            {label:'工艺规划中',value:detailPlanStats.processing,color:'#fa8c16'},
+            {label:'工艺规划完成',value:detailPlanStats.done,color:'#52c41a'},
+            {label:'异常',value:detailPlanStats.failed,color:'#ff4d4f'},
+          ].map(stat=>React.createElement(Col,{key:stat.label,flex:'1 1 0'},
+            React.createElement(Statistic,{title:stat.label,value:stat.value,valueStyle:{fontSize:18,color:stat.color,fontWeight:700}})
+          )))
+        ),
+        React.createElement(Card,{size:'small',title:'排产操作摘要',style:{marginBottom:16},bodyStyle:{padding:'10px 12px'}},
+          React.createElement(Row,{gutter:12},
+            React.createElement(Col,{span:8},React.createElement('div',null,
+              React.createElement(Text,{type:'secondary',style:{fontSize:12}},'指定生产日期'),
+              React.createElement('div',{style:{marginTop:4,fontWeight:600}},detailData.prodDate)
+            )),
+            React.createElement(Col,{span:8},React.createElement('div',null,
+              React.createElement(Text,{type:'secondary',style:{fontSize:12}},'切割机'),
+              React.createElement('div',{style:{marginTop:4}},detailData.machines.map(m=>React.createElement(Tag,{key:m,color:'geekblue',style:{marginRight:4}},m)))
+            )),
+            React.createElement(Col,{span:8},React.createElement('div',null,
+              React.createElement(Text,{type:'secondary',style:{fontSize:12}},'通路配置'),
+              React.createElement('div',{style:{marginTop:4}},detailData.machines.map((m,i)=>React.createElement(Tag,{key:m,color:'cyan',style:{marginRight:4}},`${m} → E${i%2+1}`)))
+            ))
+          )
+        ),
+        renderPlanGantt(detailData),
         React.createElement('div',{style:{marginBottom:8,fontSize:13,fontWeight:600}},
-          `切割包清单（${detailRow.packages.length} 包 / 展开查看包内型材）`),
+          '型材组清单'),
         React.createElement(Table,{
           size:'small',
-          dataSource: detailRow.packages,
+          dataSource: detailData.packages.flatMap(pkg=>pkg.profileGroups.map(group=>({...group,packageNo:pkg.packageNo}))),
           rowKey:'key',
           pagination:false,
           columns:[
-            { title:'工单号', dataIndex:'packageNo', width:170,
-              render:v => React.createElement(Tag,{color:'blue',style:{fontWeight:600}},v) },
-            { title:'船号', dataIndex:'shipNo', width:100 },
-            { title:'分段号', dataIndex:'blockNo', width:110 },
+            { title:'型材组名称', dataIndex:'profileGroupName', width:180,
+              render:v => React.createElement(Tag,{color:'blue',style:{fontWeight:600,margin:0}},v) },
+            { title:'来源工单', dataIndex:'sourceOrderNo', width:150 },
             { title:'切割机', dataIndex:'machine', width:90,
               render:v => React.createElement(Tag,{color:'geekblue',style:{margin:0}},v) },
             { title:'型材数', dataIndex:'profileCount', width:90,
               render:v => React.createElement(Tag,{color:'purple',style:{margin:0}},`${v} 根`) },
+            { title:'零件数', dataIndex:'partsQty', width:80 },
+            { title:'工艺规划状态', dataIndex:'planProgress', width:150,
+              render:v => renderPlanProgress(v) },
+            { title:'预估切割(s)', dataIndex:'cutTime', width:115 },
             { title:'入库状态', key:'stock', width:130,
-              render:(_,pkg) => inboundStatusTag(pkg.stockReady, pkg.profileCount) },
+              render:(_,g) => inboundStatusTag(g.stockReady, g.profileCount) },
           ],
           expandable:{
             expandRowByClick:true,
-            expandedRowRender: (pkg) => React.createElement('div',{style:{padding:'4px 0'}},
+            expandedRowRender: (group) => React.createElement('div',{style:{padding:'4px 0'}},
               React.createElement(Table,{
                 size:'small',
-                dataSource: pkg.profiles,
+                dataSource: group.profiles,
                 rowKey:'key',
                 pagination:false,
                 columns:[
-                  { title:'套料版图号', dataIndex:'nestingLayoutNo', width:170, ellipsis:true,
-                    render:v=>React.createElement('span',{className:'kb-mat-id'},v) },
-                  { title:'规格', dataIndex:'profileType', width:150 },
+                  { title:'套料版图号', dataIndex:'nestingLayoutNo', width:170,render:v=>React.createElement('span',{className:'kb-mat-id'},v) },
+                  { title:'规格', dataIndex:'profileType', width:140 },
                   { title:'长度(mm)', dataIndex:'length', width:100 },
                   { title:'零件数', dataIndex:'partsQty', width:80 },
+                  { title:'工艺规划状态', dataIndex:'planningStatus', width:165,
+                    render:v=>renderDetailPlanningStatus(v) },
                   { title:'预估切割时间(s)', dataIndex:'cutTime', width:130 },
-                  { title:'出库口', dataIndex:'outlet', width:90,
-                    render:v=>React.createElement(Tag,{color:'cyan',style:{margin:0}},v) },
-                  { title:'道次', dataIndex:'daoCi', width:80,
-                    render:v=>React.createElement(Tag,{color:'purple',style:{margin:0}},v) },
+                  { title:'出库口', dataIndex:'outlet', width:90 },
+                  { title:'道次', dataIndex:'daoCi', width:80 },
                 ],
               })
             )
@@ -2641,31 +3227,62 @@ const SchedPlanListPage = ({onNavigate}) => {
       )
     ),
 
+    React.createElement(Modal,{title:'工艺规划队列',open:planningQueueOpen,width:1080,onCancel:()=>setPlanningQueueOpen(false),footer:React.createElement(Button,{onClick:()=>setPlanningQueueOpen(false)},'关闭')},
+      React.createElement(Tabs,{activeKey:queueTab,onChange:k=>{setQueueTab(k);setQueueSelected([])},items:[{key:'active',label:'进行中'},{key:'completed',label:'已完成'}]}),
+      React.createElement(Space,{wrap:true,style:{marginBottom:12}},React.createElement(Select,{placeholder:'全部工单',allowClear:true,value:queueOrder,onChange:setQueueOrder,style:{width:150},options:[...new Set(planningQueue.map(x=>x.sourceOrderNo))].map(x=>({value:x,label:x}))}),React.createElement(Select,{placeholder:'全部切割机',allowClear:true,value:queueMachine,onChange:setQueueMachine,style:{width:120},options:[...new Set(planningQueue.map(x=>x.machine))].map(x=>({value:x,label:x}))}),React.createElement(Input,{placeholder:'搜索套料版图号',value:queueKeyword,onChange:e=>setQueueKeyword(e.target.value),style:{width:200}}),React.createElement(Button,{type:'primary',onClick:()=>setQueueSearch(queueKeyword)},'搜索'),React.createElement(Button,{onClick:()=>{setQueueOrder();setQueueMachine();setQueueKeyword('');setQueueSearch('')}},'重置')),
+      queueTab==='active'&&queueSelected.length>0&&React.createElement(Alert,{type:'info',showIcon:true,style:{marginBottom:12},message:`已选 ${queueSelected.length} 项`,action:React.createElement(Button,{size:'small',type:'primary',onClick:()=>msg.success('已加入优先工艺规划队列')},'批量优先工艺规划')}),
+      React.createElement(Table,{size:'small',rowKey:'key',dataSource:queueRows,pagination:{pageSize:8},rowSelection:queueTab==='active'?{selectedRowKeys:queueSelected,onChange:setQueueSelected,getCheckboxProps:r=>({disabled:!queueEligible(r)})}:undefined,columns:[{title:'套料版图号',dataIndex:'nestingLayoutNo',width:180},{title:'来源工单',dataIndex:'sourceOrderNo',width:150},{title:'切割机',dataIndex:'machine',width:90},{title:'工艺规划状态',dataIndex:'planningStatus',width:170,render:v=>renderDetailPlanningStatus(v)},{title:'进入队列时间',dataIndex:'queueTime',width:180},{title:'操作',render:(_,r)=>React.createElement(Space,null,React.createElement(Button,{size:'small',type:'link'},'查看详情'),queueTab==='active'&&queueEligible(r)&&React.createElement(Button,{size:'small',type:'link',onClick:()=>msg.success('已加入优先工艺规划队列')},'优先工艺规划'))}]})
+    ),
     React.createElement(Modal,{
       title:'下发至加工任务', open:dispatchOpen, width:880,
-      okText:dispatchTab==='from-list'?'确认下发':'重新排产', cancelText:'取消',
+      okText:'确认下发', cancelText:'取消',
       onOk:submitDispatch, onCancel:()=>setDispatchOpen(false), destroyOnClose:true,
     },
       React.createElement(Tabs,{activeKey:dispatchTab,onChange:setDispatchTab,items:[
-        {key:'from-list',label:'从排产列表内下发',children:React.createElement(Table,{
+        {key:'from-list',label:'从预排产内下发',children:React.createElement(Table,{
           size:'small', rowKey:'key',
           dataSource:list.filter(item=>item.status==='READY'),
           rowSelection:{selectedRowKeys:dispatchSelection,onChange:setDispatchSelection},
           pagination:{pageSize:6,showTotal:t=>`共 ${t} 条待下发排产`},
           columns:[
             {title:'排产序号',dataIndex:'schedNo',width:180,render:v=>React.createElement(Tag,{color:'blue',style:{margin:0}},v)},
-            {title:'工单数',dataIndex:'pkgCount',width:90,render:v=>`${v} 个`},
-            {title:'型材总数',dataIndex:'profileCount',width:100,render:v=>`${v} 根`},
+            {title:'切割包数',dataIndex:'pkgCount',width:100,render:v=>`${v} 包`},
+            {title:'型材组数',dataIndex:'groupCount',width:100,render:v=>`${v} 组`},
+            {title:'型材数',dataIndex:'profileCount',width:100,render:v=>`${v} 根`},
+            {title:'入库状态',key:'stock',width:130,render:(_,r)=>inboundStatusTag(r.stockReady,r.profileCount)},
             {title:'生产日期',dataIndex:'prodDate',width:120},
-            {title:'切割机',dataIndex:'machines',render:v=>v.join('、')},
+            {title:'切割机',dataIndex:'machines',width:130,render:v=>React.createElement(Space,{size:3,wrap:true},v.map(machine=>React.createElement(Tag,{key:machine,color:'geekblue',style:{margin:0}},machine)))},
           ],
         })},
-        {key:'replan',label:'重新排产',children:React.createElement('div',{style:{padding:'18px 4px'}},
-          React.createElement(Alert,{type:'info',showIcon:true,style:{marginBottom:16},message:'按指定生产日期重新生成一条待下发排产。'}),
-          React.createElement('div',{style:{display:'flex',alignItems:'center',gap:10}},
-            React.createElement('span',null,'生产日期'),
-            React.createElement(Input,{type:'date',value:replanDate,onChange:e=>setReplanDate(e.target.value),style:{width:170}})
-          )
+        {key:'supplement',label:'从型材组下发',children:React.createElement(React.Fragment,null,
+          React.createElement(Table,{
+            size:'small', rowKey:'key', dataSource:supplementGroups,
+            pagination:{pageSize:6,showTotal:t=>`共 ${t} 个型材组`}, locale:{emptyText:'暂无入库排产中的型材组'},
+            columns:[
+              {title:'型材组编号',dataIndex:'profileGroupNo',width:170,render:v=>React.createElement(Tag,{color:'blue',style:{margin:0}},v)},
+              {title:'型材组名称',dataIndex:'profileGroupName',width:150},
+              {title:'切割包号',dataIndex:'packageNo',width:150},
+              {title:'所属排产序号',dataIndex:'schedNo',width:180},
+              {title:'可下发型材',key:'profiles',width:110,render:(_,group)=>`${group.availableProfiles.length} 根`},
+              {title:'规划状态',dataIndex:'planProgress',width:130,render:v=>renderPlanProgress(v)},
+              {title:'入库状态',key:'stock',width:130,
+                sorter:(a,b)=>{const rank=g=>g.stockReady<=0?0:(g.stockReady<g.profileCount?1:2);return rank(a)-rank(b);},
+                sortDirections:['ascend','descend'],render:(_,group)=>inboundStatusTag(group.stockReady,group.profileCount)},
+              {title:'生产日期',dataIndex:'prodDate',width:120},
+              {title:'切割机',dataIndex:'machine',width:110,render:v=>React.createElement(Tag,{color:'geekblue',style:{margin:0}},v)},
+            ],
+            expandable:{expandRowByClick:true,expandedRowRender:group=>React.createElement('div',{style:{padding:'4px 0'}},
+              React.createElement(Table,{size:'small',dataSource:group.profiles,rowKey:'dispatchKey',pagination:false,
+                rowSelection:{selectedRowKeys:supplementSelection,onChange:setSupplementSelection,getCheckboxProps:profile=>({disabled:profile.stockStatus!=='READY'||profile.taskDispatched})},
+                columns:[
+                  {title:'套料版图号',dataIndex:'nestingLayoutNo',width:170,render:v=>React.createElement('span',{className:'kb-mat-id'},v)},
+                  {title:'型材编码',dataIndex:'profileId',width:140},{title:'规格',dataIndex:'profileType',width:130},{title:'长度(mm)',dataIndex:'length',width:100},
+                  {title:'工艺规划状态',dataIndex:'planningStatus',width:165,render:v=>renderDetailPlanningStatus(v)},
+                  {title:'入库状态',key:'stock',width:110,render:(_,profile)=>profile.stockStatus==='READY'?React.createElement(Tag,{color:'success',style:{margin:0}},'已入库'):React.createElement(Tag,{color:'default',style:{margin:0}},'未入库')},
+                  {title:'预估切割时间(s)',dataIndex:'cutTime',width:130},{title:'出库口',dataIndex:'outlet',width:90},{title:'道次',dataIndex:'daoCi',width:80},
+                ]})
+            )}
+          })
         )},
       ]})
     )
@@ -3857,8 +4474,46 @@ const LogPage = () => {
 const AppInner = () => {
   const embeddedPage = new URLSearchParams(window.location.search).get('embed');
   const [page, setPage] = useState(embeddedPage || 'dashboard');
+  const navigate = useCallback((nextPage) => setPage(nextPage), []);
   const [collapsed, setCollapsed] = useState(false);
   const [schedTargetDate, setSchedTargetDate] = useState('');
+  const [dispatchConfirm, setDispatchConfirm] = useState(null);
+  const openDispatchConfirm = (payload) => { setDispatchConfirm(payload); setPage('sched-list'); };
+  const recallToSchedule = (task, {stayOnPage=false}={}) => {
+    const packageNo = task.packageNo;
+    window.__SCHED_PLAN_LIST = (window.__SCHED_PLAN_LIST || []).map(plan => {
+      const hasPackage = (plan.packages || []).some(pkg => pkg.packageNo === packageNo);
+      if (!hasPackage) return plan;
+      return {
+        ...plan,
+        status:'READY',
+        productionStatus:'PENDING',
+        dispatchTime:'',
+        packages:(plan.packages || []).map(pkg => pkg.packageNo === packageNo
+          ? {...pkg, taskDispatched:false}
+          : pkg),
+      };
+    });
+    if (!stayOnPage) {
+      setDispatchConfirm(null);
+      setPage('sched-plan-list');
+    }
+  };
+  const confirmDispatch = (payload) => {
+    const orders=payload.orders||[];
+    window.__PENDING_PROCESSING_ORDERS=[...(window.__PENDING_PROCESSING_ORDERS||[]),...orders];
+    if (payload.mode==='full') {
+      window.__SCHED_PLAN_LIST=(window.__SCHED_PLAN_LIST||[]).map(item=>payload.planKeys.includes(item.key)
+        ? {...item,status:'DISPATCHED',productionStatus:'PENDING'} : item);
+    } else {
+      const keys=new Set(payload.profileKeys||[]);
+      window.__SCHED_PLAN_LIST=(window.__SCHED_PLAN_LIST||[]).map(item=>({...item,packages:item.packages.map(pkg=>({
+        ...pkg,profiles:pkg.profiles.map(profile=>keys.has(`${item.key}-${pkg.key}-${profile.key}`)?{...profile,taskDispatched:true}:profile)
+      }))}));
+    }
+    window.dispatchEvent(new CustomEvent('central-control:add-processing-orders',{detail:orders}));
+    setDispatchConfirm(null); setPage('outbound');
+  };
   useEffect(() => {
     const forwardImportedOrders = (ev) => {
       if (ev.data && ev.data.type === 'central-control:return-sched-plan-list') {
@@ -3957,16 +4612,11 @@ const AppInner = () => {
     switch(page) {
       case 'dashboard':   return React.createElement(InventoryDashboard,  {gridData, inventoryData});
       case 'inbound':     return React.createElement(InboundPage,         {data:inboundData,planData,onNavigate:setPage});
-      case 'outbound':    return embeddedPage
-        ? React.createElement(OutboundPage, {data:outboundData, matReports:matReportData, partsReports:partsReportData})
-        : React.createElement('iframe', {
-            src:'加工列表.html', title:'加工任务列表',
-            style:{width:'100%',height:'100%',border:0,display:'block',background:'#f5f6fa'}
-          });
+      case 'outbound':    return React.createElement(OutboundPage, {data:outboundData, matReports:matReportData, partsReports:partsReportData, onRecallToSchedule:recallToSchedule});
       case 'bin-maint':   return React.createElement(BinMaintenancePage,  {data:binMaintData});
       case 'plan':        return React.createElement(PlanPage,            {data:planData, onNavigate:setPage, onScheduleTargetDate:setSchedTargetDate});
-      case 'sched-list':  return React.createElement(SchedulePage,        {targetDate:schedTargetDate});
-      case 'sched-plan-list': return React.createElement(SchedPlanListPage, {onNavigate:setPage});
+      case 'sched-list':  return React.createElement(SchedulePage,        {targetDate:schedTargetDate,dispatchConfirm,onConfirmDispatch:confirmDispatch,onCancelDispatch:()=>{setDispatchConfirm(null);setPage('sched-plan-list');}});
+      case 'sched-plan-list': return React.createElement(SchedPlanListPage, {onNavigate:navigate,onOpenDispatchConfirm:openDispatchConfirm});
       case 'new-sched-plan':  return React.createElement(SchedulePage, {targetDate:schedTargetDate});
       case 'mat-report':  return React.createElement(MaterialReportPage,  {data:matReportData});
       case 'parts-report':return React.createElement(PartsReportPage,     {data:partsReportData});
@@ -4079,3 +4729,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
 </script>
 </body>
 </html>
+
+
