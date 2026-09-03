@@ -262,7 +262,7 @@ const OUT_STATUSES = {
   ABNORMAL:{label:'异常',color:'error'},
 };
 const PROCESS_STATUSES = {
-  WAIT:    {label:'未开始',  color:'default'},
+  WAIT:    {label:'未出库',  color:'default'},
   CALLING: {label:'叫料中',  color:'blue'},
   OUTBOUND:{label:'出库中',  color:'processing'},
   SPRAY:   {label:'喷码中',  color:'cyan'},
@@ -318,7 +318,7 @@ const makePartsReport = (n=20) => Array.from({length:n},(_,i)=>({
 /* ═══════ 加工执行：任务 · 母材报工 · 零件报工 联动数据 ═══════ */
 // 加工流水线阶段（与 PROCESS_STATUSES 对应）；matPhase 指向对应母材工序
 const PROCESS_FLOW = [
-  {key:'WAIT',     matPhase:null},     // 未开始
+  {key:'WAIT',     matPhase:null},     // 未出库
   {key:'CALLING',  matPhase:null},     // 叫料中
   {key:'OUTBOUND', matPhase:'出库'},   // 出库中
   {key:'SPRAY',    matPhase:'喷码'},   // 喷码中
