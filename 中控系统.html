@@ -323,6 +323,7 @@
 <script src="排产_输入数据.js"></script>
 <script src="排产_算法.js"></script>
 <script src="data.js"></script>
+<script src="gen-import.js"></script>
 <script>
 'use strict';
 const { useState, useEffect, useMemo, useCallback, useRef } = React;
@@ -3823,13 +3824,13 @@ const renderDetailPlanningStatus = (status) => {
     )
   );
 };
-const PlanPage = ({data, onNavigate, onScheduleTargetDate}) => {
+const PlanPage = ({data, onPlansChange, onNavigate, onScheduleTargetDate}) => {
   const {message:msg, modal} = App.useApp();
   const [plans, setPlans] = useState(() => {
     const packageDates = new Map();
     const packageCreatedAt = new Map();
     return applyPlanProdDateStore(data).map((item, index) => {
-      const scheduleDate = item.scheduleDate || packageDates.get(item.packageNo) || randomPlanDate();
+      const scheduleDate = item.genImported ? (item.scheduleDate || '') : (item.scheduleDate || packageDates.get(item.packageNo) || randomPlanDate());
       packageDates.set(item.packageNo, scheduleDate);
       const createdAt = item.createdAt || item.createTime || packageCreatedAt.get(item.packageNo)
         || `${scheduleDate} ${padZ(8 + (index % 8),2)}:${padZ(10 + (index * 7) % 50,2)}:${padZ(8 + (index * 3) % 50,2)}`;
@@ -3851,6 +3852,9 @@ const PlanPage = ({data, onNavigate, onScheduleTargetDate}) => {
   const [assignDate, setAssignDate] = useState('');
   const [newPkgOpen, setNewPkgOpen] = useState(false);
   const [upFiles, setUpFiles] = useState([]);
+  const [uploadPackage, setUploadPackage] = useState(null);
+  const [importing, setImporting] = useState(false);
+  const importLock = useRef(false);
   const [newForm] = Form.useForm();
   const [selectedPkgs, setSelectedPkgs] = useState([]);
   const [detailProfile, setDetailProfile] = useState(null);
@@ -3999,10 +4003,18 @@ const PlanPage = ({data, onNavigate, onScheduleTargetDate}) => {
 
   // ── 型材操作 ──────────────────────────────
   const syncPlans = (nextPlans) => {
+    try {
+      savePlanProdDateStore(nextPlans);
+      GenImport.save(localStorage, nextPlans);
+    } catch (error) {
+      msg.error('保存失败：浏览器存储空间不足或不可用，请减少文件数量后重试。');
+      return false;
+    }
     setPlans(nextPlans);
-    savePlanProdDateStore(nextPlans);
+    onPlansChange?.(nextPlans);
     window.PLAN_PROD_DATE_MAP = buildPlanProdDateMap(nextPlans);
     window.PLAN_ALL_PACKAGES = buildPlanAllPackages(nextPlans);
+    return true;
   };
   const updateProfile = (profile, changes) => {
     const nextPlans = plans.map(item => item.key === profile.key ? {...item, ...changes} : item);
@@ -4011,14 +4023,14 @@ const PlanPage = ({data, onNavigate, onScheduleTargetDate}) => {
   };
   const deletePackage = (pkg) => {
     modal.confirm({
-      title:`确认删除工单 ${pkg.packageNo}？`,
-      content:`该工单及其 ${pkg.profileCount} 根型材将从计划列表移除，删除后无法恢复。`,
+      title:`确认删除切割包 ${pkg.packageNo}？`,
+      content:`该切割包及其 ${pkg.profileCount} 根型材将从计划列表移除，删除后无法恢复。`,
       okText:'确认删除', cancelText:'取消', okButtonProps:{danger:true},
       onOk:() => {
-        syncPlans(plans.filter(item => item.packageNo !== pkg.packageNo));
+        if (!syncPlans(plans.filter(item => item.packageNo !== pkg.packageNo))) return;
         setSelectedPkgs(prev => prev.filter(key => key !== pkg.packageNo));
         if (detailProfile?.packageNo === pkg.packageNo) setDetailProfile(null);
-        msg.success(`工单 ${pkg.packageNo} 已删除`);
+        msg.success(`切割包 ${pkg.packageNo} 已删除`);
       }
     });
   };
@@ -4034,29 +4046,69 @@ const PlanPage = ({data, onNavigate, onScheduleTargetDate}) => {
     msg.success(`型材 ${profile.profileId} 已进入重新规划队列`);
   };
 
-  const resetNewPkg = () => { setNewPkgOpen(false); setUpFiles([]); newForm.resetFields(); };
-  const handleCreatePkg = () => {
-    // 上传套料文件创建
-    newForm.validateFields().then(v => {
-      if (plans.some(p => p.packageNo === v.packageNo)) { msg.error('任务工单号已存在'); return; }
-      const cnt = upFiles.length ? Math.max(3, upFiles.length*4) : (rnd(4)+4);
-      const newPackageDate = v.scheduleDate || '';
-      const lines = Array.from({length:cnt}, (_,i)=>({
-        key:`L${Date.now()}-${i}`, profileId:`P${randId()}`, shipNo:v.shipNo, blockNo:v.blockNo,
-        programNo:`${pick(PROG_LIST)}-${padZ(rnd(999)+1,3)}`, packageNo:v.packageNo,
-        nestingLayoutNo:`NEST-LOC-${padZ(rnd(99)+1,2)}-${padZ(i+1,2)}`, scheduleDate:newPackageDate, createdAt:new Date().toLocaleString('zh-CN'),
-        source:'LOCAL', planningStatus: pick(['NOT_STARTED','PROCESSING','PROCESS_DONE_WAIT_PLAN','PLANNING','PLAN_DONE_WAIT_MIGRATE','MIGRATING','MIGRATED','MIGRATED','PLAN_FAILED']), inStock: Math.random()<0.82, cutTime: rnd(240)+60,
-      }));
-      setPlans(prev => [...lines, ...prev]);
-      msg.success(`已新建工单 ${v.packageNo}（创建，${cnt} 根型材）`);
-      resetNewPkg();
+  const resetNewPkg = () => { setNewPkgOpen(false); setUploadPackage(null); setUpFiles([]); newForm.resetFields(); };
+  const openPackageUpload = (pkg) => {
+    setUploadPackage(pkg); setUpFiles([]);
+    newForm.setFieldsValue({packageNo:pkg.packageNo,shipNo:pkg.shipNo,blockNo:pkg.blockNo,scheduleDate:pkg.scheduleDate});
+    setNewPkgOpen(true);
+  };
+  const changeGenFiles = ({fileList}) => {
+    const names = new Set(plans.filter(p => p.packageNo === uploadPackage?.packageNo && p.genFile).map(p => p.genFile.toLowerCase()));
+    const files = [], duplicates = [];
+    fileList.forEach(file => {
+      const name = file.name.toLowerCase();
+      if (names.has(name)) { duplicates.push(file.name); return; }
+      names.add(name); files.push(file);
     });
+    if (duplicates.length) msg.warning(`已跳过同名文件：${[...new Set(duplicates)].join('、')}`);
+    setUpFiles(files);
+  };
+  const handleCreatePkg = async () => {
+    if (importLock.current) return;
+    importLock.current = true;
+    try {
+      const fields = await newForm.validateFields();
+      const v = {...fields,packageNo:fields.packageNo.trim(),shipNo:fields.shipNo.trim(),blockNo:fields.blockNo.trim()};
+      if (!uploadPackage && plans.some(p => p.packageNo === v.packageNo)) { msg.error('切割包号已存在'); return; }
+      if (!upFiles.length) { msg.warning('请至少选择一个 GEN 文件'); return; }
+      setImporting(true);
+      const results = await Promise.all(upFiles.map(async file => {
+        try { return {file, data:await GenImport.read(file.originFileObj || file)}; }
+        catch (error) { return {file, error:error.message || '文件读取失败'}; }
+      }));
+      // 全部校验成功才提交，避免部分导入后重试造成重复数据。
+      const layouts = new Set(plans.filter(p => p.packageNo === v.packageNo).map(p => p.nestingLayoutNo));
+      results.forEach(result => {
+        if (!result.data) return;
+        if (layouts.has(result.data.nestingLayoutNo)) result.error = `套料版图号 ${result.data.nestingLayoutNo} 重复`;
+        layouts.add(result.data.nestingLayoutNo);
+      });
+      setUpFiles(results.map(({file,error}) => ({...file,status:error ? 'error' : 'done',response:error,error:error ? new Error(error) : undefined})));
+      if (results.some(result => result.error)) { msg.error('部分 GEN 文件校验失败，请移除或更换标红文件后重试，尚未导入任何文件。'); return; }
+      const batchId = `GEN-${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
+      const createdAt = uploadPackage?.createdAt || dayjs().format('YYYY-MM-DD HH:mm:ss');
+      const lines = results.map(({data:profile},i) => ({
+        ...profile,key:`${batchId}-${i}`,profileId:`${batchId}-${i}`,genImported:true,
+        packageNo:v.packageNo,shipNo:v.shipNo,blockNo:v.blockNo,
+        scheduleDate:v.scheduleDate || '',createdAt,source:uploadPackage?.source || 'LOCAL',
+        prodShift:uploadPackage?.prodShift || '',planningStatus:'NOT_STARTED',inStock:false,
+      }));
+      if (!syncPlans([...lines, ...plans])) return;
+      setShipFilter(undefined); setBlockFilter(undefined); setPlanDateFilter(''); setActiveDate(null);
+      setSearchText(v.packageNo); setSearchKeyword(v.packageNo); setSelectedPkgs([]);
+      msg.success(`${uploadPackage ? '已向切割包' : '已新建切割包'} ${v.packageNo} 导入 ${lines.length} 个 GEN 文件（${lines.length} 根型材）`);
+      resetNewPkg();
+    } catch (error) {
+      if (!error.errorFields) msg.error(error.message || '导入失败，请重试');
+    } finally {
+      setImporting(false); importLock.current = false;
+    }
   };
 
   // ── 表格列定义（包级别）──────────────────
   const pkgCols = [
-    { title:'切割包号', dataIndex:'packageNo', width:140,
-      render: v => React.createElement(Tag,{color:'blue',style:{fontWeight:600,fontSize:13}},v) },
+    { title:'切割包号', dataIndex:'packageNo', width:190, ellipsis:true,
+      render: v => React.createElement(Tag,{color:'blue',title:v,style:{fontWeight:600,fontSize:13,maxWidth:'100%',overflow:'hidden',textOverflow:'ellipsis',verticalAlign:'middle'}},v) },
     { title:'船号',     dataIndex:'shipNo',     width:110 },
     { title:'分段号',   dataIndex:'blockNo',    width:110 },
     { title:'来源',     dataIndex:'source',     width:110,
@@ -4069,21 +4121,23 @@ const PlanPage = ({data, onNavigate, onScheduleTargetDate}) => {
       sorter:(a,b)=>(a.scheduleDate||'').localeCompare(b.scheduleDate||''), sortDirections:['ascend','descend'],
       render: v => v || '未排期' },
     { title:'操作', key:'op', width:90, fixed:'right',
-      render:(_,pkg)=>React.createElement(Button,{size:'small',type:'link',danger:true,onClick:()=>deletePackage(pkg)},'删除') },
+      render:(_,pkg)=>React.createElement(Button,{size:'small',type:'link',danger:true,onClick:e=>{e.stopPropagation();deletePackage(pkg);}},'删除') },
   ];
 
   const pkgDetailCols = [
+    { title:'GEN 文件', dataIndex:'genFile', width:210, ellipsis:true, render:v=>v||'—' },
     { title:'套料版图号', dataIndex:'nestingLayoutNo', width:150, ellipsis:true },
     { title:'船号', dataIndex:'shipNo', width:100 },
     { title:'分段号', dataIndex:'blockNo', width:100 },
-    { title:'程序号', dataIndex:'programNo', width:130,
-      render:v=>React.createElement(Tag,{color:'geekblue',style:{margin:0}},v) },
+    { title:'程序号', dataIndex:'programNo', width:170, ellipsis:true,
+      render:v=>React.createElement(Tag,{color:'geekblue',title:v,style:{margin:0,maxWidth:'100%',overflow:'hidden',textOverflow:'ellipsis',verticalAlign:'middle'}},v) },
     { title:'预估切割时间(s)', dataIndex:'cutTime', width:140,
       render:v=>v ?? '' },
     { title:'操作', key:'op', width:190, fixed:'right',
       render:(_,r)=>React.createElement(Space,{size:2},
         React.createElement(Button,{
           size:'small', type:'link',
+          onClick:e=>{e.stopPropagation();setDetailProfile(r);},
         },'详情'),
         React.createElement(Button,{
           size:'small', type:'link',
@@ -4122,7 +4176,7 @@ const PlanPage = ({data, onNavigate, onScheduleTargetDate}) => {
     // ① 统计卡片
     React.createElement(Row,{gutter:12,style:{marginBottom:14}},
       [
-        {label:'总工单数', val:stats.total,       color:'#1677ff'},
+        {label:'切割包总数', val:stats.total,       color:'#1677ff'},
         {label:'已排期',     val:stats.scheduled,   color:'#52c41a'},
         {label:'未排期',     val:stats.unscheduled, color:'#fa8c16'},
         {label:'总型材数', val:stats.totalLines,  color:'#722ed1'},
@@ -4146,7 +4200,7 @@ const PlanPage = ({data, onNavigate, onScheduleTargetDate}) => {
           placeholder:'按船号筛选', allowClear:true, style:{width:130},
           value:shipFilter, onChange:v=>{ setShipFilter(v); setSelectedPkgs([]); },
         },
-          SHIP_LIST.map(v=>React.createElement(Option,{key:v,value:v},v))
+          Array.from(new Set(allPackages.map(p=>p.shipNo))).filter(Boolean).sort().map(v=>React.createElement(Option,{key:v,value:v},v))
         ),
         React.createElement(Select,{
           placeholder:'按分段号筛选', allowClear:true, style:{width:160},
@@ -4157,9 +4211,9 @@ const PlanPage = ({data, onNavigate, onScheduleTargetDate}) => {
           type:'date', value:planDateFilter, style:{width:160},
           onChange:e=>{ setPlanDateFilter(e.target.value); setSelectedPkgs([]); },
         }),
-        React.createElement(Button,{disabled:!planDateFilter,onClick:()=>setPlanDateFilter('')},'重置'),
+        React.createElement(Button,{disabled:!planDateFilter&&!shipFilter&&!blockFilter&&!searchKeyword&&!activeDate,onClick:()=>{setPlanDateFilter('');setShipFilter(undefined);setBlockFilter(undefined);setSearchText('');setSearchKeyword('');setActiveDate(null);}},'重置'),
         React.createElement('div',{style:{flex:1}}),
-        React.createElement(Button,{type:'primary',ghost:true,onClick:()=>setNewPkgOpen(true)},'+ 新建工单'),
+        React.createElement(Button,{type:'primary',ghost:true,onClick:()=>{setUploadPackage(null);setNewPkgOpen(true);}},'+ 新建切割包'),
       )
     ),
 
@@ -4175,7 +4229,7 @@ const PlanPage = ({data, onNavigate, onScheduleTargetDate}) => {
       ),
       extra: !activeDate && !shipFilter && !blockFilter && !planDateFilter && !searchKeyword &&
         React.createElement(Text,{type:'secondary',style:{fontSize:12}},
-          `共 ${allPackages.length} 个工单`)
+          `共 ${allPackages.length} 个切割包`)
     },
       React.createElement(Table,{
         rowSelection,
@@ -4208,9 +4262,10 @@ const PlanPage = ({data, onNavigate, onScheduleTargetDate}) => {
       open: !!detailProfile, onClose:()=>setDetailProfile(null),
     },
       detailProfile && React.createElement(Descriptions,{column:2,size:'small',bordered:true},
-        React.createElement(Descriptions.Item,{label:'所属任务工单'},
+        React.createElement(Descriptions.Item,{label:'所属切割包'},
           React.createElement(Tag,{color:'blue',style:{fontWeight:600}},detailProfile.packageNo)),
         React.createElement(Descriptions.Item,{label:'套料版图号'},detailProfile.nestingLayoutNo||'-'),
+        React.createElement(Descriptions.Item,{label:'GEN 文件',span:2},detailProfile.genFile||'-'),
         React.createElement(Descriptions.Item,{label:'船号'},detailProfile.shipNo||'-'),
         React.createElement(Descriptions.Item,{label:'分段号'},detailProfile.blockNo||'-'),
         React.createElement(Descriptions.Item,{label:'程序号'},
@@ -4241,23 +4296,36 @@ const PlanPage = ({data, onNavigate, onScheduleTargetDate}) => {
       )
     ),
 
-    // 新建工单 Modal（上传套料文件）
+    // 新建切割包 / 向已有切割包批量追加 GEN 文件
     React.createElement(Modal,{
-      title:'新建工单', open:newPkgOpen, width:560, okText:'创建', cancelText:'取消',
-      onOk:handleCreatePkg, onCancel:resetNewPkg, destroyOnClose:true,
+      title:uploadPackage ? `上传 GEN — ${uploadPackage.packageNo}` : '新建切割包', open:newPkgOpen, width:700,
+      bodyStyle:{maxHeight:'65vh',overflowY:'auto',paddingRight:4},
+      okText:uploadPackage ? '导入切割包' : '创建切割包', cancelText:'取消',confirmLoading:importing,
+      cancelButtonProps:{disabled:importing},closable:!importing,maskClosable:!importing,keyboard:!importing,
+      onOk:handleCreatePkg, onCancel:()=>{if(!importing)resetNewPkg();}, destroyOnClose:true,
     },
-      React.createElement(Form,{form:newForm,layout:'vertical'},
+      React.createElement(Form,{form:newForm,layout:'vertical',disabled:importing},
             React.createElement(Row,{gutter:14},
-              React.createElement(Col,{span:12},React.createElement(Form.Item,{name:'packageNo',label:'任务工单号',rules:[{required:true,message:'请输入任务工单号'}]},React.createElement(Input,{placeholder:'如 PKG-100'}))),
-              React.createElement(Col,{span:12},React.createElement(Form.Item,{name:'shipNo',label:'船号',rules:[{required:true,message:'请输入船号'}]},React.createElement(Input,{placeholder:'如 H1234'}))),
-              React.createElement(Col,{span:12},React.createElement(Form.Item,{name:'blockNo',label:'分段号',rules:[{required:true,message:'请输入分段号'}]},React.createElement(Input,{placeholder:'如 A01'}))),
-              React.createElement(Col,{span:12},React.createElement(Form.Item,{name:'scheduleDate',label:'计划日期'},React.createElement(Input,{type:'date'}))),
+              React.createElement(Col,{span:12},React.createElement(Form.Item,{name:'packageNo',label:'切割包号',rules:[{required:true,whitespace:true,message:'请输入切割包号'}]},React.createElement(Input,{placeholder:'如 PKG-100',disabled:!!uploadPackage||importing}))),
+              React.createElement(Col,{span:12},React.createElement(Form.Item,{name:'shipNo',label:'船号',rules:[{required:true,whitespace:true,message:'请输入船号'}]},React.createElement(Input,{placeholder:'如 H1234',disabled:!!uploadPackage||importing}))),
+              React.createElement(Col,{span:12},React.createElement(Form.Item,{name:'blockNo',label:'分段号',rules:[{required:true,whitespace:true,message:'请输入分段号'}]},React.createElement(Input,{placeholder:'如 A01',disabled:!!uploadPackage||importing}))),
+              React.createElement(Col,{span:12},React.createElement(Form.Item,{name:'scheduleDate',label:'计划日期'},React.createElement(Input,{type:'date',disabled:!!uploadPackage||importing}))),
             ),
-            React.createElement(Form.Item,{label:'上传套料文件'},
-              React.createElement(Upload.Dragger,{accept:'.gen,.nest',multiple:false,beforeUpload:()=>false,fileList:upFiles,onChange:(info)=>setUpFiles(info.fileList)},
-                React.createElement('p',{style:{margin:0,fontSize:13,color:'#1677ff'}},'点击或拖拽文件到此处上传'),
-                React.createElement('p',{style:{margin:'4px 0 0',fontSize:12,color:'#8c8c8c'}},'支持 .gen、.nest 文件，系统将解析套料信息')
-              )
+            React.createElement(Form.Item,{label:'批量上传 GEN 文件',required:true},
+              React.createElement(Upload.Dragger,{accept:'.gen,.GEN',multiple:true,disabled:importing,
+                beforeUpload:file=>{if(!/\.gen$/i.test(file.name)){msg.error(`${file.name}：仅支持 .gen 文件`);return Upload.LIST_IGNORE;}return false;},
+                fileList:upFiles,onChange:changeGenFiles,
+                showUploadList:{showRemoveIcon:false},
+                itemRender:(node,file)=>React.createElement('div',null,
+                  React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8}},
+                    React.createElement('div',{style:{flex:1,minWidth:0}},node),
+                    React.createElement(Button,{size:'small',type:'link',disabled:importing,'aria-label':`移除 ${file.name}`,onClick:()=>setUpFiles(prev=>prev.filter(item=>item.uid!==file.uid))},'移除')),
+                  file.status==='error'&&React.createElement(Text,{type:'danger',style:{display:'block',fontSize:12}},file.response)),
+              },
+                React.createElement('p',{style:{margin:0,fontSize:14,color:'#e85b00'}},'点击选择或拖拽多个 GEN 文件到此处'),
+                React.createElement('p',{style:{margin:'6px 0 0',fontSize:12,color:'#8c8c8c'}},'支持批量选择 .gen 文件，所有文件归入当前切割包；同名文件自动跳过')
+              ),
+              React.createElement(Text,{type:'secondary',style:{display:'block',marginTop:10}},`已选择 ${upFiles.length} 个 GEN 文件${upFiles.length ? '，可在提交前移除文件' : ''}`)
             )
           )
     ),
@@ -4931,7 +4999,11 @@ const AppInner = () => {
   // Init data once
   const gridData       = useMemo(initGrid, []);
   const inventoryData  = useMemo(()=>makeInventory(gridData), [gridData]);
-  const planData       = useMemo(()=>makePlansFromSchedDb(window.SCHED_DB), []);
+  const [planData, setPlanData] = useState(()=>{
+    const base = makePlansFromSchedDb(window.SCHED_DB);
+    try { return [...GenImport.load(localStorage), ...base]; }
+    catch (error) { console.error('本地 GEN 切割包读取失败', error); return base; }
+  });
   useEffect(() => {
     const applied = applyPlanProdDateStore(planData);
     window.PLAN_PROD_DATE_MAP = buildPlanProdDateMap(applied);
@@ -5014,7 +5086,7 @@ const AppInner = () => {
       case 'inbound':     return React.createElement(InboundPage,         {data:inboundData,planData,onNavigate:setPage});
       case 'outbound':    return React.createElement(OutboundPage, {data:outboundData, matReports:matReportData, partsReports:partsReportData, onRecallToSchedule:recallToSchedule});
       case 'bin-maint':   return React.createElement(BinMaintenancePage,  {data:binMaintData});
-      case 'plan':        return React.createElement(PlanPage,            {data:planData, onNavigate:setPage, onScheduleTargetDate:setSchedTargetDate});
+      case 'plan':        return React.createElement(PlanPage,            {data:planData, onPlansChange:setPlanData, onNavigate:setPage, onScheduleTargetDate:setSchedTargetDate});
       case 'sched-list':  return React.createElement(SchedulePage,        {targetDate:schedTargetDate,dispatchConfirm,onConfirmDispatch:confirmDispatch,onCancelDispatch:()=>{setDispatchConfirm(null);setPage('sched-plan-list');},disableCreateOrder:true});
       case 'sched-plan-list': return React.createElement(SchedPlanListPage, {onNavigate:navigate,onOpenDispatchConfirm:openDispatchConfirm});
       case 'new-sched-plan':  return React.createElement(SchedulePage, {targetDate:schedTargetDate});
@@ -5129,5 +5201,3 @@ ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(
 </script>
 </body>
 </html>
-
-
