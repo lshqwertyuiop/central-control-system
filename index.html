@@ -328,6 +328,8 @@
 <script src="排产_算法.js"></script>
 <script src="data.js"></script>
 <script src="gen-import.js"></script>
+<script src="list-fields.js"></script>
+<script src="inbound-page.js"></script>
 <script>
 'use strict';
 
@@ -5190,7 +5192,7 @@ const AppInner = () => {
     window.PLAN_PROD_DATE_MAP = buildPlanProdDateMap(applied);
     window.PLAN_ALL_PACKAGES = buildPlanAllPackages(applied);
   }, [planData]);
-  const inboundData    = useMemo(()=>makeInbound(18, planData), [planData]);
+  const [inboundData, setInboundData] = useState(()=>makeInbound(18, planData));
   const production     = useMemo(()=>makeProductionData(20), []);
   const outboundData   = production.outbound;
   const matReportData  = production.matReports;
@@ -5264,7 +5266,7 @@ const AppInner = () => {
   const renderPage = () => {
     switch(page) {
       case 'dashboard':   return React.createElement(InventoryDashboard,  {gridData, inventoryData});
-      case 'inbound':     return React.createElement(InboundPage,         {data:inboundData,planData,onNavigate:setPage});
+      case 'inbound':     return React.createElement(LocalInboundPage,    {data:inboundData,onTasksChange:setInboundData});
       case 'outbound':    return React.createElement(OutboundPage, {data:outboundData, planData, matReports:matReportData, partsReports:partsReportData, onRecallToSchedule:recallToSchedule});
       case 'bin-maint':   return React.createElement(BinMaintenancePage,  {data:binMaintData});
       case 'plan':        return React.createElement(PlanPage,            {data:planData, onPlansChange:setPlanData, onNavigate:setPage, onScheduleTargetDate:setSchedTargetDate});

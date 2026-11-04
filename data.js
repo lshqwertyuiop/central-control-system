@@ -168,7 +168,6 @@ const makePlans = (pkgCount=10) => {
 
 const INB_STATUSES = {
   NOT_STARTED: {label:'未开始',   color:'default'},
-  ZONE_MATCH_FAILED:{label:'库区匹配异常', color:'error'},
   WAIT:        {label:'待入库',   color:'warning'},
   CHECK_FAILED:{label:'校验异常', color:'error'},
   IN_PROGRESS: {label:'入库中',   color:'processing'},
@@ -181,17 +180,17 @@ const INB_MATERIALS = ['AH32','DH36','EH36','Q235B','Q345B'];
 const INB_LENGTHS = [6000,9000,11000,12000,13500];
 const INB_ZONES = ['1号分区','2号分区','3号分区'];
 const makeInbound = (n=18, plans=[]) => {
-  const schedRows = Array.isArray(plans) ? plans.filter(p => p.planningStatus === 'PLANNED') : [];
-  const failAt = Math.min(4, Math.max(0, n - 1));
+  const schedRows = Array.isArray(plans) ? plans.filter(p => ['PLANNED','MIGRATED'].includes(p.planningStatus)) : [];
+  const waitingCount = Math.min(4, n);
   const historyFrom = Math.min(11, n);
   const shortProgramNo = value => {
     const match = String(value || '').toUpperCase().match(/(?:HC)?(PX|PY|PZ|PJ)/);
     return match ? match[1] : String(value || '');
   };
   const rows = Array.from({length:n},(_,i)=>{
-    const status = i < failAt ? 'WAIT' : (i < historyFrom ? 'NOT_STARTED' : 'FINISHED');
-    const matchedPlan = schedRows.length && i !== failAt ? schedRows[i % schedRows.length] : null;
-    const matchedZone = matchedPlan ? INB_ZONES[(i + matchedPlan.key) % INB_ZONES.length] : '';
+    const status = i < waitingCount ? 'WAIT' : (i < historyFrom ? 'NOT_STARTED' : 'FINISHED');
+    const matchedPlan = schedRows.length ? schedRows[i % schedRows.length] : null;
+    const matchedZone = matchedPlan ? INB_ZONES[i % INB_ZONES.length] : '';
     return {
       key:i+1,
       taskNo:`INB-2026-${padZ(i+1,4)}`,
@@ -204,12 +203,8 @@ const makeInbound = (n=18, plans=[]) => {
       length:matchedPlan?.length || pick(INB_LENGTHS),
       heatNo:String(1000+rnd(9000)),
       mode:pick(Object.keys(INB_MODES)),
-      status: matchedPlan ? status : 'ZONE_MATCH_FAILED', manualNote:null, order:i,
+      status, manualNote:null, order:i,
       zone: matchedZone,
-      zoneMatchStatus: matchedPlan ? 'MATCHED' : 'FAILED',
-      zoneMatchSource: matchedPlan ? '排产匹配' : '',
-      matchedPlanKey: matchedPlan?.key || null,
-      autoBlocked: i > failAt && i < historyFrom,
       binCode: !matchedPlan || status==='NOT_STARTED' ? '' : ('A-'+padZ(rnd(20)+1)),
       createTime:randTime(),
       startTime: status==='FINISHED' ? randTime() : '',
@@ -218,7 +213,7 @@ const makeInbound = (n=18, plans=[]) => {
       reportTime: status==='FINISHED' ? randTime() : '',
     };
   });
-  const waiting = rows.filter(x=>x.status==='WAIT' && x.zoneMatchStatus==='MATCHED');
+  const waiting = rows.filter(x=>x.status==='WAIT');
   if (waiting.length) waiting[rnd(waiting.length)].status = 'CHECK_FAILED';
   return rows;
 };
